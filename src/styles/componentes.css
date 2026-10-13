@@ -1,4 +1,4 @@
-/* Componentes del sistema (sección 9.4). Cada uno documenta sus variantes y estados en #/sistema. */
+/* Componentes de Voltia. Variantes y estados documentados en docs/sistema.md. */
 
 /* ---------- Íconos ---------- */
 .ico {
@@ -193,7 +193,7 @@
 }
 .tabla-filtros { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e-2) var(--e-3); font-size: var(--t-s); }
 .tabla-filtros label { display: inline-flex; align-items: center; gap: 6px; color: var(--texto-secundario); font-weight: var(--peso-normal); }
-.tabla-filtros input[type='search'] { min-width: 230px; font-size: var(--t-s); min-height: 32px; padding: 4px 8px; width: auto; }
+.tabla-filtros input[type='search'] { min-width: 230px; font-size: var(--t-s); min-height: 32px; padding: 4px 12px 4px 36px; background-position: 12px center; width: auto; }
 .tabla-scroll { overflow-x: auto; }
 .tabla {
   width: 100%;
@@ -225,9 +225,9 @@
 .tabla tbody tr:last-child td { border-bottom: 0; }
 .tabla tr.fila--atenuada td { color: var(--texto-secundario); background: #fbfbfc; }
 .tabla tr.fila--atenuada td .atenuable { text-decoration: line-through; text-decoration-color: var(--borde-control); }
-.tabla tr.fila--resaltada td { background: var(--acento-fondo); }
-.tabla tr.fila--aviso td { background: #fffaf0; }
-.tabla tr.fila--negativa td { background: #fff7f6; }
+.tabla tr.fila--resaltada > * { background: var(--acento-fondo); }
+.tabla tr.fila--aviso > * { background: #fffaf0; }
+.tabla tr.fila--negativa > * { background: #fff7f6; }
 .tabla tfoot td { font-weight: var(--peso-fuerte); background: var(--fondo); border-top: 1px solid var(--borde-control); border-bottom: 0; }
 .tabla .grupo td { background: var(--fondo); font-weight: var(--peso-fuerte); }
 .tabla .col-fija { position: sticky; left: 0; background: inherit; z-index: 1; }

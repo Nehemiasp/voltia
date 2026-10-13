@@ -2,32 +2,31 @@
 
 > Proyecto conceptual. Voltia, sus tiendas, sus personas y sus cifras son ficticios.
 
-Prototipo navegable y caso de estudio de un sistema de gestión de comisiones para una cadena de retail con 14 tiendas y unos 180 vendedores. Demuestra diseño de sistemas con **reglas, estados, roles y consecuencias en el tiempo**: reglas configurables sin programar, cálculo con trazabilidad, ciclo mensual con responsables, ajustes retroactivos explicados y simulación antes de cambiar una regla.
+Voltia es un sistema de gestión de comisiones para una cadena de retail con 14 tiendas y unos 180 vendedores. Cubre reglas configurables sin programar, cálculo con trazabilidad, ciclo mensual con responsables, ajustes retroactivos explicados y simulación antes de cambiar una regla.
 
-La pantalla central es el **ajuste de Marta**: una devolución de Q12,000 que le generó Q600 revierte **Q3,780**, porque al bajar de 105 % a 97 % de su meta cambió de escalón y la nueva tasa se aplica a todo lo demás que vendió. El prototipo lo calcula, no lo cuenta.
+La pieza central es el **ajuste de Marta**: una devolución de Q12,000 que le generó Q600 revierte **Q3,780**, porque al bajar de 105 % a 97 % de su meta cambió de escalón y la nueva tasa se aplica a todo lo demás que vendió. El sistema lo calcula, no lo cuenta.
 
 ## Probarlo
 
 ```
-npm install        # solo para las herramientas de capturas y pruebas visuales
+npm install        # solo para las pruebas con Chromium
 npm start          # http://localhost:5173
 ```
 
-El prototipo no tiene dependencias en tiempo de ejecución: HTML, CSS y JavaScript con módulos ES. Necesita un servidor estático (los módulos no cargan desde `file://`).
+HTML, CSS y JavaScript con módulos ES, sin dependencias en tiempo de ejecución. Necesita un servidor estático (los módulos no cargan desde `file://`).
 
-Empieza por **Recorrido de la demo**. La barra superior cambia el momento de la historia (22 de enero, 2 de febrero, 3 de abril), el rol y el estado de la vista (con datos, cargando, vacío, error). Con cada rol se ven las pantallas y las acciones que le tocan.
+Se abre en **Inicio**: el estado del mes, lo que requiere atención, las tiendas, la comisión por mes y la actividad reciente. La fecha de trabajo es el 3 de abril de 2026: enero y febrero están pagados y marzo está en revisión.
 
-| Pantalla | Qué ver |
-|---|---|
-| P01 · P02 · P10 | Reglas en orden de aplicación, constructor con frase de lectura en vivo y simulador (Analista) |
-| P03 | Detalle con cascada de reglas y cada cifra explicable (Analista, Jefe, Gerente, Auditoría, Vendedor) |
-| P04 a P07 | Ciclo del mes: corrida, revisión por tienda, aprobación irreversible y pago (Analista, Jefe, Gerente, Contabilidad) |
-| P08 · P09 | Disputa de Jorge y ajuste de Marta (Analista, Gerente, Vendedor) |
-| P11 | Mi comisión en móvil (Vendedor) |
-| P12 | Historial de auditoría (Auditoría) |
-| Sistema de diseño | Tokens, tipografía y componentes con variantes y estados |
+Cada rol ve solo lo que le corresponde. Para cambiar de usuario, abre el menú de la esquina superior derecha.
 
-El caso de estudio está en [`caso/`](caso/index.html).
+| Sección | Qué hace | Quién la usa |
+|---|---|---|
+| Inicio | Estado del período, siguiente paso, indicadores y pendientes | Todos |
+| Reglas y Simulador | Reglas en orden de aplicación, constructor con frase de lectura en vivo, simulador de impacto | Analista (el Gerente consulta y aprueba activaciones) |
+| Período | Corrida, revisión por tienda, aprobación irreversible y pago | Analista, Jefe de tienda, Gerente, Contabilidad |
+| Detalle de comisión | Cascada de reglas, ventas con su motivo de exclusión y cada cifra explicable | Todos, según permisos |
+| Correcciones | Ajustes retroactivos (el de Marta) y disputas | Analista, Gerente, Jefe de tienda |
+| Historial | Quién cambió qué, cuándo, con valor anterior y nuevo | Auditoría y demás roles |
 
 ## Qué hay en el repositorio
 
@@ -36,8 +35,8 @@ El caso de estudio está en [`caso/`](caso/index.html).
 | `src/engine/` | Reglas R-001 a R-006, datos de ejemplo, generación determinista de ventas y motor de cálculo |
 | `src/app/` | Aplicación: estado, permisos por rol, acciones, selectores y vistas |
 | `test/` | 23 pruebas que reproducen las cifras de las secciones 4 y 5 del documento maestro |
-| `docs/` | [Documento maestro](docs/VOLTIA-CASO-COMPLETO.md), [decisiones](docs/decisiones.md), [modelo](docs/modelo.md), [especificaciones de interacción](docs/specs-interaccion.md), [sistema de diseño](docs/sistema.md), [caso de estudio](docs/caso-de-estudio.md) y [reporte de entrega](docs/ENTREGA.md) |
-| `portafolio/` | Imágenes (1600 px a 2x) y video de la secuencia de Marta |
+| `docs/` | [Documento maestro](docs/VOLTIA-CASO-COMPLETO.md), [decisiones](docs/decisiones.md), [modelo](docs/modelo.md), [especificaciones de interacción](docs/specs-interaccion.md), [sistema de diseño](docs/sistema.md) y [reporte de entrega](docs/ENTREGA.md) |
+| `caso/`, `portafolio/` | Página del caso de estudio con imágenes y video. Se hicieron con una versión anterior de la interfaz y no se regeneran |
 
 ## Que las cifras cuadran
 
@@ -51,7 +50,7 @@ El caso de estudio está en [`caso/`](caso/index.html).
 
 ## Qué es de verdad y qué es de muestra
 
-El motor de cálculo es real y probado. Los **datos** son de muestra: 4 de las 14 tiendas y 47 vendedores, con ventas generadas de forma determinista para que los totales coincidan con la sección 4 del documento maestro. Lo que no está en el documento se marca como supuesto en [`docs/decisiones.md`](docs/decisiones.md). No hay servidor, base de datos ni autenticación: el estado de la demostración vive en el navegador (`localStorage`, opcional) y se restablece con un botón.
+El motor de cálculo es real y probado. Los **datos** son de muestra: 4 de las 14 tiendas y 47 vendedores, con ventas generadas de forma determinista para que los totales coincidan con la sección 4 del documento maestro. Lo que no está en el documento se marca como supuesto en [`docs/decisiones.md`](docs/decisiones.md). No hay servidor, base de datos ni autenticación: el estado vive en el navegador (`localStorage`, opcional) y se restablece desde el menú de usuario.
 
 ## Créditos
 

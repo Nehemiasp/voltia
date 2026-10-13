@@ -1,6 +1,6 @@
 # Sistema de diseño
 
-La referencia viva está en la pantalla **Sistema de diseño** del prototipo (`#/sistema`), que dibuja cada componente con las mismas funciones y clases que usan las pantallas. Este documento resume lo esencial.
+Las piezas están en `src/app/ui.js` (funciones que devuelven HTML) y `src/styles/`. Este documento resume lo esencial.
 
 ## Principios
 
@@ -51,10 +51,16 @@ Fondos de estado añadidos al validar contraste (el documento los dejaba por def
 | Diálogo de confirmación | con resumen de impacto, con campo, con casilla “no se puede deshacer” | P04, P06, P07, P09 |
 | Bandeja de pendientes | tope, ajuste, observación, regla | P06 |
 | Frase de lectura | una frase por escalón | P02 |
-| Estados vacío, cargando y error | cada pantalla, desde el control “Vista” | todas |
+| Estados vacío, cargando y error | cada pantalla (`estadoVista`, `esqueleto`) | todas |
 
 Además: botones (principal, secundario, discreto, destructivo, con ícono, deshabilitado con motivo visible, cargando), avisos (información, atención, error, listo), avisos temporales, medidor del límite, barra apilada y pestañas.
 
 ## Iconos
 
 Un solo set: Lucide (licencia ISC), en `assets/iconos.svg`, generado con `tools/sprite-iconos.mjs`. Nunca emojis.
+
+## Controles de formulario
+
+- Campos de texto, número, fecha y búsqueda: 38 px de alto, 12 px de margen interior a cada lado.
+- `select` con flecha propia (Lucide `chevron-down`) a 12 px del borde derecho, igual que el texto a la izquierda. La flecha nativa del navegador queda pegada al borde y rompe ese margen.
+- Búsqueda con ícono a 12 px del borde izquierdo y el texto a 40 px.

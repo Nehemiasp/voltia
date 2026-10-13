@@ -32,7 +32,6 @@ function tic(minutos = 4) {
 function actor() {
   const st = obtener();
   const rol = ROLES[st.rol];
-  if (st.rol === 'vendedor') return { usuario: VENDEDOR[st.vendedorActivo].nombre, rol: st.rol, vendedorId: st.vendedorActivo };
   return { usuario: rol.persona.nombre, rol: st.rol };
 }
 
@@ -52,26 +51,17 @@ function exigir(accion) {
 }
 
 // ---------------------------------------------------------------------------
-// Demostración
+// Sesión
 // ---------------------------------------------------------------------------
-
-export function cambiarMomento(id) {
-  const st = obtener();
-  reemplazar(estadoInicial(id, { rol: st.rol, vendedorActivo: st.vendedorActivo }));
-}
 
 export function cambiarRol(rol) {
   obtener().rol = rol;
   emitir();
 }
 
-export function cambiarVendedor(id) {
-  obtener().vendedorActivo = id;
-  emitir();
-}
-
+/** Vuelve a los datos de partida (3 de abril de 2026) conservando el rol activo. */
 export function reiniciar() {
-  cambiarMomento(obtener().momento);
+  reemplazar(estadoInicial({ rol: obtener().rol }));
 }
 
 // ---------------------------------------------------------------------------
@@ -409,24 +399,6 @@ export function devolverAjuste(id, comentario) {
 // ---------------------------------------------------------------------------
 // Disputas
 // ---------------------------------------------------------------------------
-
-export function abrirDisputa({ periodo, ventas = [], faltante = null, motivo }) {
-  const no = exigir('disputa.abrir');
-  if (no) return no;
-  const st = obtener();
-  if (!motivo?.trim()) return fallo('Cuéntanos qué parte de tu resultado no coincide.');
-  if (!ventas.length && !faltante) return fallo('Elige las ventas en cuestión o indica la venta que falta.');
-  st.contadores.disputa += 1;
-  const id = `D-${String(st.contadores.disputa).padStart(3, '0')}`;
-  tic();
-  st.disputas.push({
-    id, vendedorId: st.vendedorActivo, periodo, ventas, faltante, motivo: motivo.trim(), estado: 'Abierta', abierta: st.reloj,
-    respuesta: '', resueltaPor: null, resueltaEn: null, opiniones: [], ajusteIds: [],
-  });
-  registrar({ accion: 'Abrir disputa', entidad: ent('Disputa', id, `${id} · ${VENDEDOR[st.vendedorActivo].nombre}`, `#/disputa/${id}`), nuevo: 'Abierta', comentario: motivo.trim(), vendedorId: st.vendedorActivo, periodo });
-  emitir();
-  return exito({ id });
-}
 
 export function tomarDisputa(id) {
   const no = exigir('disputa.resolver');

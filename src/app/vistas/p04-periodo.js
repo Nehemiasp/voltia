@@ -109,9 +109,9 @@ export default {
       const t = resumen.calc.totales;
       const c = resumen.conteo;
       const conteo = [
-        ['calculada', 'Calculadas', 'neutro'], ['en-revision', 'En revisión', 'aviso'], ['observada', 'Observadas', 'negativo'],
-        ['aprobada', 'Aprobadas', 'positivo'], ['pagada', 'Pagadas', 'positivo'], ['ajustada', 'Ajustadas', 'acento'], ['bloqueada', 'Bloqueadas', 'aviso'],
-      ].filter(([k]) => c[k] > 0).map(([k, texto, v]) => `<li>${chip(v, `${c[k]} ${texto.toLowerCase()}`)}</li>`).join('');
+        ['calculada', 'calculada', 'calculadas', 'neutro'], ['en-revision', 'en revisión', 'en revisión', 'aviso'], ['observada', 'observada', 'observadas', 'negativo'],
+        ['aprobada', 'aprobada', 'aprobadas', 'positivo'], ['pagada', 'pagada', 'pagadas', 'positivo'], ['ajustada', 'ajustada', 'ajustadas', 'acento'], ['bloqueada', 'bloqueada', 'bloqueadas', 'aviso'],
+      ].filter(([k]) => c[k] > 0).map(([k, uno, varios, v]) => `<li>${chip(v, `${c[k]} ${c[k] === 1 ? uno : varios}`)}</li>`).join('');
       cuerpoResumen = `<div class="datos-fila">
         ${dato('Total a pagar', q(resumen.total), resumen.pendiente > 0 ? `${q(resumen.pendiente)} más esperan autorización` : 'Comprometido hoy', { grande: true })}
         ${dato('Contra el período anterior', resumen.diferencia === null ? '<span class="secundario">Sin período previo</span>' : `${variacion(resumen.diferencia, { inverso: true })}`, resumen.diferenciaPct === null ? '' : `${esc(fmtPct(resumen.diferenciaPct))} · ${esc(nombrePeriodo(resumen.previoId))}`)}
@@ -129,7 +129,7 @@ export default {
     const conjunto = reg?.corrida ? CONJUNTOS[reg.corrida.version] : conjuntoDelPeriodo(periodo);
     const congeladas = panel({
       titulo: 'Reglas con las que se calcula', subtitulo: `Conjunto ${esc(conjunto.id)}, vigente desde ${esc(fmtFecha(conjunto.vigenteDesde))} ${esc(conjunto.vigenteDesde.slice(0, 4))}`,
-      cuerpo: `<p class="fila" style="gap:6px">${reglasCongeladas(conjunto.id)}</p><p class="secundario pequeno" style="margin-top:8px">La corrida guarda esta versión. Editar una regla después crea un borrador que no afecta a esta corrida (D-07).</p>`,
+      cuerpo: `<p class="fila" style="gap:6px">${reglasCongeladas(conjunto.id)}</p><p class="secundario pequeno" style="margin-top:8px">La corrida guarda esta versión. Editar una regla después crea un borrador que no afecta a esta corrida.</p>`,
     });
 
     const html = `<div class="pagina">
@@ -141,7 +141,7 @@ export default {
         ${calculado ? panel({ titulo: 'Resumen de la corrida', cuerpo: cuerpoResumen }) : panel({ titulo: 'Resumen', cuerpo: cuerpoResumen })}
         ${alertas}
         <div class="rejilla rejilla--2">${congeladas}${panel({ titulo: 'Corridas de este período', cuerpo: reg ? tablaCorridas(reg) : '', sinRelleno: true })}</div>
-        ${calculado ? `<p class="secundario pequeno">${ico('info')} Para revisar vendedor por vendedor, abre <a href="#/tienda?p=${periodo}">Revisión de tienda</a>.</p>` : ''}
+        ${calculado ? `<p class="secundario pequeno">${ico('info')} Para revisar vendedor por vendedor, abre <a href="#/tienda?p=${periodo}">Tiendas</a>.</p>` : ''}
       </div></div>`;
 
     const progreso = (pasosCompletos, pct) => `<div class="panel"><div class="panel__cuerpo"><div class="fila fila--entre"><strong>Ejecutando la corrida de ${esc(nombrePeriodo(periodo))}</strong><span class="secundario pequeno">${pct} %</span></div>

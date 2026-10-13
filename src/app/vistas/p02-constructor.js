@@ -40,7 +40,7 @@ function formularioInicial(id, ctx) {
     const partes = ctx.query.e.split(',').map((p) => p.split(':').map(Number));
     f.escalones = partes.map(([desde_, tasa], i) => ({ desde: desde_, tasa, hasta: null })).map((e, i, a) => ({ ...e, hasta: i < a.length - 1 ? Math.round((a[i + 1].desde - 0.01) * 100) / 100 : null }));
     f.sucio = true;
-    f.fuente = 'Simulación de cambio de regla (P10)';
+    f.fuente = 'Simulador de cambio de regla';
   }
   return f;
 }
@@ -229,7 +229,7 @@ export default {
         botones.push(boton({ texto: 'Solicitar activación', icono: 'send', accion: 'solicitar', foco: 'solicitar', deshabilitado: Boolean(motivoActivar), motivo: motivoActivar }));
         if (f.sucio || f.guardado) botones.push(boton({ texto: 'Descartar cambios', clase: 'btn--discreto', icono: 'x', accion: 'descartar' }));
         botones.push(motivoVisible(motivoActivar || motivoGuardar));
-        botones.push(`<p class="diminuto secundario">Activar una versión requiere la aprobación del Gerente Comercial: el Analista prepara y el Gerente aprueba (D-10).</p>`);
+        botones.push(`<p class="diminuto secundario">Activar una versión requiere la aprobación del Gerente Comercial: el Analista prepara y el Gerente aprueba.</p>`);
       } else {
         botones.push(motivoVisible(motivoSinPermiso('reglas.editar')));
       }
@@ -308,7 +308,7 @@ export default {
           const { confirmado } = await confirmar({
             titulo: `Solicitar la activación de ${id} v${f.version}`,
             resumen: [['Regla', esc(`${id} v${f.version} · ${f.nombre}`)], ['Cambio', esc(f.escalones ? textoCalculo(f.escalones) : f.calculo)], ['Vigente desde', esc(fmtFechaLarga(f.vigenciaDesde))], ['Fuente', esc(f.fuente)], ['Quién aprueba', 'Gerente Comercial']],
-            aviso: { variante: 'info', html: 'La versión vigente sigue calculando hasta que el Gerente apruebe. Ninguna corrida ejecutada cambia (D-07).' }, textoConfirmar: 'Solicitar activación',
+            aviso: { variante: 'info', html: 'La versión vigente sigue calculando hasta que el Gerente apruebe. Ninguna corrida ejecutada cambia.' }, textoConfirmar: 'Solicitar activación',
           });
           if (!confirmado) return;
           const res = ctx.acc.solicitarActivacion(id);

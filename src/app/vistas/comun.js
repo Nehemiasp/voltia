@@ -5,7 +5,7 @@ import { esc, nombrePeriodo } from '../../engine/formato.js';
 import { estadoVista } from '../ui.js';
 import { INICIO_POR_ROL } from '../permisos.js';
 
-/** Período pedido en la URL, o el más relevante según el momento de la historia. */
+/** Período pedido en la URL, o el más relevante según la fecha de trabajo. */
 export function periodoDe(ctx, { conResultados = true } = {}) {
   const pedido = ctx.query.p;
   const lista = conResultados ? periodosConResultados() : periodosDisponibles();
@@ -63,7 +63,7 @@ export async function dialogoObservar(ctx, vendedorId, periodo) {
   const r = resultado(vendedorId, periodo);
   const { confirmado, valor } = await confirmar({
     titulo: `Marcar una observación sobre ${v.nombre}`,
-    descripcion: 'La observación bloquea la aprobación de este vendedor. El resto de la tienda sigue su curso (D-06).',
+    descripcion: 'La observación bloquea la aprobación de este vendedor. El resto de la tienda sigue su curso.',
     resumen: [['Vendedor', esc(v.nombre)], ['Período', esc(nombrePeriodo(periodo))], ['Total del período', esc(fmtQ(r.total))]],
     campo: { etiqueta: 'Motivo de la observación', requerido: true, placeholder: 'Por ejemplo: falta una venta del 28 de enero.', mensajeRequerido: 'Escribe el motivo para que el Analista sepa qué revisar.' },
     textoConfirmar: 'Marcar observación',

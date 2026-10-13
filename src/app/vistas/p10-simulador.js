@@ -148,7 +148,7 @@ export default {
       const cambioEsc = p.desde.some((d, i) => d !== base.desde[i]) || p.tasa.some((t, i) => t !== base.tasa[i]);
       const acciones = raiz.querySelector('#sim-acciones');
       acciones.innerHTML = `<div class="pila pila--s">${boton({ texto: 'Crear borrador de R-001 con este cambio', clase: 'btn--primario', icono: 'pencil', accion: 'borrador', deshabilitado: !ok || !soloR001 || !cambioEsc || !analista, motivo: !analista ? 'Solo el Analista crea borradores.' : !cambioEsc ? 'Cambia un escalón para crear un borrador.' : !soloR001 ? 'El borrador se crea desde cambios a los escalones de R-001.' : 'Los escalones no son válidos.' })}
-        <p class="diminuto secundario">El borrador necesita aprobación del Gerente antes de activarse (D-10).</p></div>`;
+        <p class="diminuto secundario">El borrador necesita aprobación del Gerente antes de activarse.</p></div>`;
     }
 
     return {

@@ -1,4 +1,4 @@
-// Utilidades para controlar el prototipo con Chromium (pruebas visuales y capturas).
+// Utilidades para controlar Voltia con Chromium (pruebas de recorridos y revisión visual).
 import { chromium } from 'playwright-core';
 
 export const CHROME = process.env.CHROME_PATH ?? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
@@ -17,22 +17,20 @@ export async function abrir({ ancho = 1440, alto = 900, escala = 1, video = null
   return { navegador, contexto, pagina, errores };
 }
 
-/** Prepara el estado de la demo (momento, rol, vendedor) y navega a una ruta. */
-export async function irA(pagina, { momento = 'M1', rol = 'analista', vendedor = null, ruta = '#/inicio' } = {}) {
+/** Parte de los datos iniciales, elige el rol desde el menú de usuario y navega a una ruta. */
+export async function irA(pagina, { rol = 'analista', ruta = '#/inicio' } = {}) {
   await pagina.goto(`${BASE}/`, { waitUntil: 'networkidle' });
   await pagina.evaluate(() => localStorage.clear());
   await pagina.goto(`${BASE}/`, { waitUntil: 'networkidle' });
-  await abrirControles(pagina);
-  await pagina.selectOption('#demo-momento', momento);
-  await pagina.selectOption('#demo-rol', rol);
-  if (vendedor) await pagina.selectOption('#demo-vendedor', vendedor);
+  await cambiarRol(pagina, rol);
   await pagina.evaluate((r) => { location.hash = r; }, ruta);
   await pagina.waitForTimeout(250);
 }
 
-/** En pantallas angostas los controles de la demostración están plegados. */
-export async function abrirControles(pagina) {
-  await pagina.evaluate(() => document.querySelector('.demo-det')?.setAttribute('open', ''));
+export async function cambiarRol(pagina, rol) {
+  await pagina.click('#btn-usuario');
+  await pagina.click(`#menu-usuario [data-rol="${rol}"]`);
+  await pagina.waitForTimeout(150);
 }
 
 export async function esperarFuentes(pagina) {

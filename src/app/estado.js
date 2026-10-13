@@ -1,12 +1,12 @@
-// Contenedor del estado de la demostración. Se guarda en localStorage solo como comodidad:
+// Contenedor del estado de la aplicación. Se guarda en localStorage solo como comodidad:
 // la aplicación funciona igual si el almacenamiento no está disponible.
 
 import { estadoInicial } from './semillas.js';
 
-const CLAVE = 'voltia-demo-v3';
-const VERSION = 3;
+const CLAVE = 'voltia-v4';
+const VERSION = 4;
 
-let estado = leer() ?? estadoInicial('M1');
+let estado = leer() ?? estadoInicial();
 const oyentes = new Set();
 
 function leer() {
@@ -24,7 +24,7 @@ function guardar() {
   try {
     globalThis.localStorage?.setItem(CLAVE, JSON.stringify(estado));
   } catch {
-    /* sin almacenamiento: la demostración sigue funcionando en memoria */
+    /* sin almacenamiento: la aplicación sigue funcionando en memoria */
   }
 }
 

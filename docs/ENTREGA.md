@@ -8,7 +8,7 @@ Reporte siguiendo el formato del estándar Lumacode (sección 14) y el plan por 
 - **Qué hace, en una frase:** sistema de gestión de comisiones de una cadena de retail ficticia.
 - **Para quién:** seis roles internos y la fuerza de ventas; el lector del caso busca ver diseño de sistemas, no solo pantallas.
 - **Trabajo principal:** explicar cualquier comisión y gobernar el ciclo mensual y sus correcciones.
-- **Páginas o pantallas incluidas:** P01 a P12, inicio con recorrido, sistema de diseño y página del caso.
+- **Pantallas incluidas:** Inicio, Reglas (lista y constructor), Simulador, Período (corrida, tiendas, aprobación, pagos), Detalle de comisión, Correcciones (ajustes y disputas) e Historial. La página del caso quedó de una versión anterior.
 - **Fuera de alcance:** servidor, base de datos, autenticación, las 14 tiendas completas, liquidación por renuncia, archivos de Figma.
 - **Contenido disponible:** documento maestro (datos, reglas, pantallas).
 - **Contenido faltante (marcadores):** `[Duración del proyecto]` en la portada del caso; dominio real en `canonical`, `sitemap.xml` y `robots.txt` (hoy `voltia.example`).
@@ -20,11 +20,11 @@ Reporte siguiendo el formato del estándar Lumacode (sección 14) y el plan por 
 ## Qué se hizo
 
 - **Motor de cálculo** (`src/engine/`): reglas R-001 a R-006 con versiones y conjuntos congelados por corrida, segunda pasada del bono de equipo, recálculo retroactivo con las reglas del período de origen, ajustes con límite de 50 %. **23 pruebas** reproducen las cifras de las secciones 4 y 5.
-- **Prototipo navegable** (`src/app/`): las 12 pantallas con sus estados de vacío, carga y error, seis roles con la matriz de permisos aplicada, tres momentos de la historia y acciones reales (corrida, observaciones, decisiones, aprobación, exportación a CSV, pago, ajustes, disputas, versionado de reglas) con rastro de auditoría.
+- **Aplicación** (`src/app/`): pantallas con sus estados de vacío, carga y error, cinco roles con la matriz de permisos aplicada, una fecha de trabajo fija (3 de abril de 2026), un inicio con el estado del mes y acciones reales (corrida, observaciones, decisiones, aprobación, exportación a CSV, pago, ajustes, disputas, versionado de reglas) con rastro de auditoría.
 - **Sistema de diseño** (fase 4): tokens, tipografía, 12 componentes con variantes, documento de especificaciones de P02, P03 y P09.
 - **Documentación de diseño:** 23 decisiones con alternativa descartada, modelo con diagramas, texto del caso.
 - **Caso de estudio** maquetado, 19 imágenes (1600 px a 2x) y el video de la secuencia de Marta.
-- **Herramientas de verificación:** `npm test` (23), `npm run e2e` (5 recorridos, 35 comprobaciones), `npm run revision` (4 anchos × 24 pantallas), `npm run lint`.
+- **Herramientas de verificación:** `npm test` (23), `npm run e2e` (6 recorridos), `npm run revision` (4 anchos × 20 pantallas), `npm run lint`.
 
 ## Fases del documento maestro
 
@@ -33,7 +33,7 @@ Reporte siguiendo el formato del estándar Lumacode (sección 14) y el plan por 
 | 1 · Fundación | Modelo, P01, P02, P03, decisiones D-01 a D-08 | Hecho en código; wireframes sin hacer (ver “Qué falta”) |
 | 2 · Ciclo operativo | P04 a P07, estados y permisos | Hecho; prototipo navegable del ciclo completo |
 | 3 · Excepciones | P08 a P12, escenario de Marta, simulador, móvil | Hecho; secuencia animada en video y en P09 |
-| 4 · Sistema | Componentes, tokens, specs y handoff | Hecho en `#/sistema` y en `docs/` |
+| 4 · Sistema | Componentes, tokens, specs y handoff | Hecho en `src/app/ui.js`, `src/styles/` y `docs/` |
 
 ## Qué no se tocó
 
@@ -73,7 +73,7 @@ No hay fotos. Ver [`IMAGENES.md`](../IMAGENES.md).
 - [x] Nada de trabajos con restricción ni empresas reales.
 
 **Diseño**
-- [x] Cada pantalla tiene estados de vacío, carga y error (control “Vista”) y los propios del flujo.
+- [x] Cada pantalla tiene estados de vacío, carga y error en el código (`estadoVista`, `esqueleto`) y los propios del flujo.
 - [x] Montos con números tabulares, alineados a la derecha.
 - [x] Estados con texto e ícono; contraste AA de los tokens calculado.
 - [x] Acciones irreversibles con confirmación y resumen de impacto.
@@ -113,7 +113,7 @@ npm run e2e                   # recorridos con Chromium (con el servidor en marc
 npm run revision              # revisión de anchos, h1, alt y consola
 ```
 
-Recorrido sugerido: abrir **Recorrido de la demo** y pulsar “El caso de Marta: por qué son Q3,780 y no Q600”; luego “Ver la secuencia”.
+Recorrido sugerido: **Inicio** → cambiar a Gerente Comercial desde el menú de usuario → autorizar el tope y el ajuste de Marta → aprobar marzo → cambiar a Contabilidad → exportar y pagar.
 
 ## Qué falta del documento maestro
 
@@ -125,3 +125,11 @@ Recorrido sugerido: abrir **Recorrido de la demo** y pulsar “El caso de Marta:
 - Probar el constructor de reglas con alguien que nunca vio el modelo.
 - Una vista de comparación de dos corridas de un mismo período.
 - Exportar el historial de auditoría por rango de fechas desde el servidor, con firma del archivo.
+
+
+## Cambios posteriores a la entrega
+
+- Se quitó la barra de demostración (momentos de la historia, estado de la vista, restablecer), el recorrido de la demo, la pantalla del sistema de diseño y la vista del vendedor. La fecha de trabajo quedó fija en el 3 de abril de 2026 y los roles son cinco.
+- Nuevo **Inicio** por rol. Las pantallas del ciclo se agrupan en pestañas (Período, Correcciones) y la navegación pasó de 16 entradas a entre 3 y 6 por rol.
+- Se corrigió el espaciado de los `select` y de la búsqueda con ícono.
+- Se quitaron los scripts que regeneraban capturas, video y caso (dependían de lo anterior).

@@ -146,3 +146,10 @@ Los supuestos están marcados como **(supuesto)**. Ninguno contradice una cifra 
 - **Elegida:** prototipo navegable en código con un motor de cálculo probado, más documentación de diseño en Markdown y capturas para el portafolio.
 - **Descartada:** esperar a Figma, porque el caso entero gira alrededor de cifras que se calculan y que cambian con las acciones de cada rol.
 - **Qué falta:** los archivos de Figma (sección 12) quedan pendientes y se pueden generar a partir de este prototipo.
+
+### D-24 · Menos pantallas, un inicio por rol y sin capa de demostración **(decisión del dueño del proyecto)**
+- **Contexto:** la primera versión tenía 12 pantallas más un recorrido guiado, una barra con momentos de la historia y una pantalla del sistema de diseño dentro de la aplicación. Se leía como una demo con guion, no como un producto, y la lógica del ciclo no se seguía.
+- **Elegida:** una fecha de trabajo fija (3 de abril de 2026: enero y febrero pagados, marzo en revisión), un **Inicio** que muestra el estado del mes y lo que le toca a cada rol, y secciones con pestañas (Período: corrida, tiendas, aprobación, pagos; Correcciones: ajustes y disputas). El cambio de rol vive en el menú de usuario. Se quitaron el recorrido, la pantalla del sistema de diseño (queda en `docs/sistema.md`), la vista móvil del vendedor (P11) y la apertura de disputas por el vendedor; el rol de vendedor deja de existir en la aplicación y las disputas ya registradas las gestiona el Analista.
+- **Descartadas:** conservar los momentos de la historia (obligan a explicar la demo antes de usarla) y un solo rol sin menú (impide ver la aprobación del Gerente y el pago de Contabilidad, que son la mitad de la lógica).
+- **Efecto sobre el documento maestro:** la sección 7 (mapa por rol, P08 del vendedor y P11) describe el alcance completo; la aplicación implementa el recorte de esta decisión. Los datos, las reglas y los permisos de la sección 3 no cambian.
+- **Dónde se ve:** Inicio, menú de usuario, pestañas de Período y Correcciones.

@@ -1,96 +1,212 @@
-// Recorrido de la demo: qué es Voltia, los tres momentos de la historia y atajos a cada caso.
+// Inicio: el estado del mes de un vistazo y lo que cada rol tiene que hacer ahora.
 
-import { MOMENTOS } from '../semillas.js';
-import { ORDEN_APLICACION } from '../../engine/reglas.js';
-import { ROLES } from '../permisos.js';
-import { ico, panel, encabezado, chipRegla2 } from '../ui.js';
-import { esc } from '../../engine/formato.js';
-import { ID } from '../../engine/datos.js';
+import {
+  periodoRegistro, estadoPeriodo, resumenPeriodo, periodosConResultados, pendientesGerente, bloqueosAprobacion,
+  observaciones, totalAPagar, eventosDe, fechaHoy,
+} from '../selectores.js';
+import { VENDEDOR } from '../../engine/datos.js';
+import { esc, fmtPct, fmtFechaLarga, nombrePeriodo, mesCorto } from '../../engine/formato.js';
+import {
+  ico, chip, chipPeriodo, q, panel, encabezado, dato, boton, variacion, lineaEstados, eventos, estadoVista,
+} from '../ui.js';
+import { ROLES, rutasPermitidas } from '../permisos.js';
+import { periodoDe, selectorPeriodo, enlazarSelectores } from './comun.js';
 
-const FLUJOS = [
-  { id: 'reglas', titulo: 'Configurar una regla sin programar', texto: 'Editar R-001, ver la frase de lectura en vivo y probar el cambio con Marta antes de guardar.', pantallas: 'P01 · P02', momento: 'M1', rol: 'analista', ruta: '#/regla/R-001' },
-  { id: 'explicar', titulo: 'Explicar cualquier número', texto: 'El detalle de Marta en enero: cascada de reglas, ventas excluidas y cada cifra clicable.', pantallas: 'P03', momento: 'M2', rol: 'analista', ruta: `#/detalle/${ID.marta}?p=2026-01` },
-  { id: 'ciclo', titulo: 'El ciclo del mes, de la corrida al pago', texto: 'Ejecutar la corrida de enero, resolver a Sofía sin meta, revisar, aprobar y pagar. Cambia de rol para cada paso.', pantallas: 'P04 a P07', momento: 'M1', rol: 'analista', ruta: '#/periodos' },
-  { id: 'tope', titulo: 'Una excepción que decide una persona', texto: 'Luis Ortega supera el tope. El Gerente decide; el sistema no recorta en silencio.', pantallas: 'P06', momento: 'M2', rol: 'gerente', ruta: '#/aprobacion' },
-  { id: 'marta', titulo: 'El caso de Marta: por qué son Q3,780 y no Q600', texto: 'Antes y después de enero, la separación de la diferencia y la aplicación en marzo con el límite de 50 %.', pantallas: 'P09', momento: 'M2', rol: 'analista', ruta: '#/ajuste/AJ-2026-03-001' },
-  { id: 'simulador', titulo: 'Antes de cambiar una regla', texto: 'Subir el escalón de 100 % de 5 % a 5.5 % y ver el costo, los ganadores y las tiendas.', pantallas: 'P10', momento: 'M2', rol: 'analista', ruta: '#/simulador' },
-  { id: 'vendedor', titulo: 'Lo que ve el vendedor', texto: 'Marta a mitad de enero: cuánto lleva, cuánto le falta para el siguiente escalón y cuánto ganaría.', pantallas: 'P11', momento: 'M0', rol: 'vendedor', vendedor: ID.marta, ruta: '#/mi-comision' },
-  { id: 'disputa', titulo: 'Una venta que no aparece', texto: 'Jorge Castillo reclama una venta que quedó a nombre de otro vendedor. El Analista la encuentra y genera los ajustes.', pantallas: 'P08', momento: 'M2', rol: 'analista', ruta: '#/disputa/D-014' },
-  { id: 'auditoria', titulo: 'Reconstruir un número meses después', texto: 'Quién cambió qué, cuándo, con qué valor anterior y nuevo. Desde cada evento se llega a la entidad.', pantallas: 'P12', momento: 'M2', rol: 'auditoria', ruta: '#/auditoria' },
-];
+const mayuscula = (texto) => texto.charAt(0).toUpperCase() + texto.slice(1);
 
-const GLOSARIO = [
-  ['Meta', 'Monto de venta que se espera de un vendedor en un período.'],
-  ['Cumplimiento', 'Venta comisionable del período dividida entre la meta.'],
-  ['Escalón', 'Rango de cumplimiento que define la tasa de comisión.'],
-  ['Tasa', 'Porcentaje de comisión según el escalón alcanzado.'],
-  ['Factor de categoría', 'Multiplicador que ajusta la comisión según el tipo de producto.'],
-  ['Venta comisionable', 'Venta vigente que no fue excluida por R-006.'],
-  ['Corrida', 'Ejecución del cálculo de un período con una versión fija de las reglas.'],
-  ['Versión de reglas', 'Conjunto de reglas vigentes congelado en un momento dado.'],
-  ['Ajuste', 'Corrección aplicada en un período abierto que se refiere a un período anterior.'],
-  ['Saldo pendiente', 'Parte de un ajuste negativo que se descuenta en períodos siguientes.'],
-  ['Observación', 'Marca de revisión que detiene la aprobación de un vendedor.'],
-  ['Disputa', 'Reclamo formal de un vendedor sobre su resultado.'],
-  ['Trazabilidad', 'Posibilidad de explicar un número paso a paso hasta su origen.'],
-];
+function fechasDelPeriodo(reg) {
+  return {
+    'Cerrado a ventas': reg.cerradoVentas, Calculado: reg.corridas[0]?.fecha, 'En revisión': reg.enviadoRevision, Aprobado: reg.aprobadoEn, Pagado: reg.pagadoEn,
+  };
+}
+
+// ---------- Qué toca hacer ahora, según el rol y el estado del período ----------
+
+function siguientePaso(ctx, periodo, estado) {
+  const p = `?p=${periodo}`;
+  const mes = nombrePeriodo(periodo);
+  const bloqueos = estado === 'En revisión' ? bloqueosAprobacion(periodo) : [];
+  const abiertas = observaciones(periodo, { abiertas: true });
+  const pasos = {
+    analista: {
+      Abierto: ['Cerrar el período a ventas', `Cuando termine ${mes}, ciérralo para que las ventas tardías se traten como ajustes.`, `#/periodos${p}`, 'Ir a la corrida'],
+      'Cerrado a ventas': ['Ejecutar la corrida', 'La corrida congela las reglas y calcula una comisión por vendedor.', `#/periodos${p}`, 'Ir a la corrida'],
+      Calculado: ['Enviar a revisión', 'Revisa las alertas de la corrida y envía el período a los jefes de tienda.', `#/periodos${p}`, 'Ir a la corrida'],
+      'En revisión': bloqueos.length
+        ? ['Resolver lo que bloquea la aprobación', bloqueos.map((b) => b.texto).join(' '), `#/periodos${p}`, 'Ver alertas']
+        : ['Esperar la aprobación del Gerente', 'No hay nada bloqueando. El Gerente Comercial aprueba el período.', null, ''],
+      Aprobado: ['Esperar el pago', 'Contabilidad exporta el período y lo marca como pagado.', null, ''],
+      Pagado: ['Período cerrado', 'Ya no se modifica. Cualquier corrección entra como ajuste en un período abierto.', `#/ajustes`, 'Ver ajustes'],
+    },
+    jefe: {
+      'En revisión': ['Revisar a tu equipo', `Revisa a los vendedores de tu tienda en ${mes} y marca observaciones si algo no cuadra.`, `#/tienda${p}`, 'Revisar mi tienda'],
+      default: ['Nada que revisar por ahora', `Las observaciones se marcan cuando el período está en revisión. Hoy ${mes} está “${estado}”.`, `#/tienda${p}`, 'Ver mi tienda'],
+    },
+    gerente: {
+      'En revisión': bloqueos.length
+        ? ['Decidir lo pendiente antes de aprobar', bloqueos.map((b) => b.texto).join(' '), '#/aprobacion', 'Ir a la aprobación']
+        : [`Aprobar ${mes}`, 'No hay bloqueos. Aprobar es irreversible: después solo se corrige con ajustes.', '#/aprobacion', 'Ir a la aprobación'],
+      default: ['Sin decisiones sobre este período', `${mes} está “${estado}”.`, `#/aprobacion${p}`, 'Ver la aprobación'],
+    },
+    contabilidad: {
+      Aprobado: ['Exportar y marcar como pagado', `${mes} está aprobado. Exporta el archivo y comprueba que cuadra con lo aprobado.`, `#/pagos${p}`, 'Ir a pagos'],
+      Pagado: ['Período pagado', 'Ya no se modifica.', `#/pagos${p}`, 'Ver el pago'],
+      default: ['Esperando la aprobación', `${mes} está “${estado}”. Contabilidad recibe el período cuando el Gerente lo aprueba.`, null, ''],
+    },
+    auditoria: {
+      default: ['Consultar el rastro', 'Cada cambio queda registrado con quién, cuándo, valor anterior y nuevo.', '#/auditoria', 'Abrir el historial'],
+    },
+  };
+  const tabla = pasos[ctx.rol];
+  const [titulo, texto, href, boton1] = tabla[estado] ?? tabla.default;
+  const urgente = ctx.rol === 'jefe' ? estado === 'En revisión' && abiertas.length > 0 : false;
+  return { titulo, texto, href, boton: boton1, urgente };
+}
+
+function panelPaso(ctx, periodo, estado, reg) {
+  const paso = siguientePaso(ctx, periodo, estado);
+  return panel({
+    titulo: `${mayuscula(nombrePeriodo(periodo))} en el ciclo del mes`,
+    subtitulo: `${chipPeriodo(estado)} ${reg?.corrida ? `· reglas congeladas ${esc(reg.corrida.version)}` : ''}`,
+    cuerpo: `${lineaEstados(estado, reg ? fechasDelPeriodo(reg) : {})}
+      <div class="siguiente-paso"><span class="siguiente-paso__icono">${ico('arrow-right')}</span><div><strong>${esc(paso.titulo)}</strong><p>${esc(paso.texto)}</p></div>
+      ${paso.href ? boton({ texto: paso.boton, clase: 'btn--primario', href: paso.href }) : ''}</div>`,
+  });
+}
+
+// ---------- Indicadores ----------
+
+function indicadores(periodo, resumen) {
+  const t = resumen.calc.totales;
+  const vendido = resumen.calc.tiendas.reduce((s, x) => s + x.vendido, 0);
+  const meta = resumen.calc.tiendas.reduce((s, x) => s + x.meta, 0);
+  return `<div class="panel"><div class="panel__cuerpo"><div class="datos-fila">
+    ${dato('Total a pagar', q(resumen.total), resumen.pendiente > 0 ? `${q(resumen.pendiente)} más esperan autorización` : 'Comprometido hoy', { grande: true })}
+    ${dato('Contra el período anterior', resumen.diferencia === null ? '<span class="secundario">Sin período previo</span>' : variacion(resumen.diferencia, { inverso: true }), resumen.diferenciaPct === null ? '' : `${esc(fmtPct(resumen.diferenciaPct))} · ${esc(nombrePeriodo(resumen.previoId))}`)}
+    ${dato('Cumplimiento de las tiendas', esc(fmtPct((vendido / meta) * 100, { fijo: true })), `${q(vendido)} de ${q(meta)}`)}
+    ${dato('Vendedores', String(t.vendedores), `${q(t.bonos)} en bonos de equipo`)}
+  </div></div></div>`;
+}
+
+// ---------- Lo que requiere atención ----------
+
+function itemAtencion({ icono, tono = '', titulo, texto, href, enlace = 'Abrir' }) {
+  return `<li class="pendiente"><span class="pendiente__icono${tono}">${ico(icono)}</span>
+    <div><div class="pendiente__titulo">${esc(titulo)}</div><p class="pendiente__texto">${esc(texto)}</p></div>
+    <div class="pendiente__acciones">${href ? boton({ texto: enlace, clase: 'btn--s', href }) : ''}</div></li>`;
+}
+
+function pendientesDelRol(ctx, periodo, resumen) {
+  const permitidas = rutasPermitidas(ctx.rol);
+  const items = [];
+  if (ctx.rol === 'gerente') {
+    for (const it of pendientesGerente()) {
+      const [icono, tono, href] = {
+        tope: ['scale', '', '#/aprobacion'],
+        ajuste: ['git-compare', ' pendiente__icono--acento', `#/ajuste/${it.ajusteId}`],
+        observacion: ['flag', ' pendiente__icono--negativo', `#/detalle/${it.vendedorId}?p=${it.periodo}`],
+        regla: ['pencil', ' pendiente__icono--acento', `#/regla/${it.reglaId}`],
+      }[it.tipo];
+      items.push(itemAtencion({ icono, tono, titulo: it.titulo, texto: it.texto, href, enlace: it.tipo === 'tope' ? 'Decidir' : 'Revisar' }));
+    }
+    return items;
+  }
+  if (ctx.rol === 'jefe') {
+    observaciones(periodo, { abiertas: true })
+      .filter((o) => VENDEDOR[o.vendedorId].tienda === ctx.st.tiendaJefe)
+      .forEach((o) => items.push(itemAtencion({ icono: 'flag', tono: ' pendiente__icono--negativo', titulo: `${VENDEDOR[o.vendedorId].nombre}: observación abierta`, texto: o.motivo, href: `#/detalle/${o.vendedorId}?p=${o.periodo}`, enlace: 'Ver detalle' })));
+    return items;
+  }
+  if (ctx.rol === 'analista' || ctx.rol === 'auditoria') {
+    for (const a of resumen.alertas) {
+      const icono = a.tipo === 'bloqueada' ? 'ban' : a.tipo === 'tope' ? 'scale' : a.tipo === 'observacion' ? 'flag' : a.tipo === 'ajuste' ? 'git-compare' : 'rotate-ccw';
+      const href = a.ref ? `#/ajuste/${a.ref}` : a.vendedorId ? `#/detalle/${a.vendedorId}?p=${periodo}` : permitidas.has('periodos') ? `#/periodos?p=${periodo}` : null;
+      items.push(itemAtencion({ icono, tono: a.nivel === 'aviso' ? '' : ' pendiente__icono--acento', titulo: a.titulo, texto: a.texto, href, enlace: a.ref ? 'Ver ajuste' : 'Ver detalle' }));
+    }
+  }
+  return items;
+}
+
+function panelAtencion(ctx, periodo, resumen) {
+  const items = pendientesDelRol(ctx, periodo, resumen);
+  const cuerpo = items.length
+    ? `<ul class="bandeja">${items.join('')}</ul>`
+    : `<div class="vacio-simple">${ico('circle-check')}<div><strong>Todo al día</strong><p>No hay nada pendiente para ti en este momento.</p></div></div>`;
+  return panel({
+    titulo: ctx.rol === 'gerente' ? 'Pendiente de tu decisión' : 'Requiere atención',
+    subtitulo: items.length ? `${items.length} ${items.length === 1 ? 'elemento' : 'elementos'}` : '',
+    cuerpo, sinRelleno: true,
+  });
+}
+
+// ---------- Tiendas y evolución ----------
+
+function panelTiendas(ctx, periodo, resumen) {
+  const verTienda = rutasPermitidas(ctx.rol).has('tienda');
+  const MAX = 140;
+  const filas = resumen.calc.tiendas.map((t) => {
+    const ancho = Math.min(100, (t.cumplimiento / MAX) * 100);
+    const marca = (100 / MAX) * 100;
+    const nombre = verTienda ? `<a href="#/tienda?p=${periodo}&t=${t.id}">${esc(t.nombre)}</a>` : esc(t.nombre);
+    return `<li class="tienda-fila">
+      <div class="tienda-fila__cab"><span class="tienda-fila__nombre">${nombre}</span><span class="tienda-fila__pct">${esc(fmtPct(t.cumplimiento, { fijo: true }))}</span></div>
+      <div class="barra-simple" role="img" aria-label="${esc(t.nombre)}: ${esc(fmtPct(t.cumplimiento, { fijo: true }))} de la meta"><i style="width:${ancho.toFixed(1)}%"></i><b style="left:${marca.toFixed(1)}%"></b></div>
+      <div class="tienda-fila__pie"><span class="secundario">${q(t.vendido)} de ${q(t.meta)}</span>${t.ganaBono ? chip('positivo', 'Gana el bono', 'circle-check') : chip('neutro', 'Sin bono de equipo')}</div></li>`;
+  }).join('');
+  return panel({ titulo: 'Tiendas', subtitulo: 'Cumplimiento de la meta. La marca vertical es el 100 %.', cuerpo: `<ul class="lista-tiendas">${filas}</ul>` });
+}
+
+function panelEvolucion(ctx, periodoActual) {
+  const periodos = periodosConResultados();
+  const totales = periodos.map((p) => ({ p, total: totalAPagar(p), estado: estadoPeriodo(p) }));
+  const max = Math.max(...totales.map((t) => t.total), 1);
+  const filas = totales.map((t) => `<li class="${t.p === periodoActual ? 'barras__actual' : ''}">
+    <span class="barras__mes">${esc(mesCorto(t.p))} ${esc(t.p.slice(0, 4))}</span>
+    <span class="barras__barra" aria-hidden="true"><i style="width:${((t.total / max) * 100).toFixed(1)}%"></i></span>
+    <span class="barras__valor">${q(t.total)}</span>
+    <span class="barras__estado">${esc(t.estado)}</span></li>`).join('');
+  return panel({ titulo: 'Comisión a pagar por mes', subtitulo: 'Total por período, con ajustes y sin el exceso de tope que aún espera decisión.', cuerpo: `<ol class="barras">${filas}</ol>` });
+}
+
+function panelActividad(ctx) {
+  if (ctx.rol === 'jefe') return '';
+  const lista = eventosDe().slice(-5).reverse();
+  return panel({
+    titulo: 'Actividad reciente',
+    acciones: rutasPermitidas(ctx.rol).has('auditoria') ? boton({ texto: 'Ver el historial', clase: 'btn--s btn--discreto', href: '#/auditoria' }) : '',
+    cuerpo: eventos(lista),
+  });
+}
+
+// ---------- Vista ----------
 
 export default {
   id: 'inicio',
-  titulo: 'Recorrido de la demo',
+  titulo: 'Inicio',
   render(ctx) {
-    const momentos = Object.values(MOMENTOS).map((m) => `
-      <li class="momento${m.id === ctx.st.momento ? ' momento--actual' : ''}">
-        <strong>${esc(m.etiqueta)}</strong>
-        <p>${esc(m.descripcion)}</p>
-        <button type="button" class="btn btn--s${m.id === ctx.st.momento ? '' : ''}" data-accion="momento" data-id="${m.id}" ${m.id === ctx.st.momento ? 'aria-pressed="true"' : 'aria-pressed="false"'}>${m.id === ctx.st.momento ? 'Estás aquí' : 'Viajar a este momento'}</button>
-      </li>`).join('');
+    const lista = periodosConResultados();
+    if (!lista.length) {
+      return { html: `<div class="pagina">${encabezado({ titulo: 'Inicio' })}${estadoVista('vacio', { titulo: 'Todavía no hay períodos calculados', texto: 'Cuando el Analista ejecute la primera corrida, aquí aparece el resumen del mes.' })}</div>` };
+    }
+    const periodo = periodoDe(ctx);
+    const reg = periodoRegistro(periodo);
+    const estado = estadoPeriodo(periodo);
+    const resumen = resumenPeriodo(periodo);
+    const rol = ROLES[ctx.rol];
 
-    const flujos = FLUJOS.map((f) => `
-      <li class="flujo">
-        <div class="flujo__cab"><span class="chip chip--neutro">${esc(f.pantallas)}</span><span class="diminuto secundario">${esc(MOMENTOS[f.momento].etiqueta.split(' · ')[0])} · ${esc(ROLES[f.rol].corto)}</span></div>
-        <h3>${esc(f.titulo)}</h3>
-        <p>${esc(f.texto)}</p>
-        <button type="button" class="btn btn--s" data-accion="flujo" data-id="${f.id}">Abrir este caso</button>
-      </li>`).join('');
+    const html = `<div class="pagina">
+      ${encabezado({
+        titulo: 'Inicio',
+        descripcion: `${esc(rol.persona.nombre)} · ${esc(rol.nombre)} · hoy es ${esc(fmtFechaLarga(fechaHoy()))}`,
+        acciones: selectorPeriodo(ctx, periodo),
+      })}
+      <div class="pila">
+        ${panelPaso(ctx, periodo, estado, reg)}
+        ${indicadores(periodo, resumen)}
+        <div class="rejilla rejilla--2" style="align-items:start">${panelAtencion(ctx, periodo, resumen)}${panelTiendas(ctx, periodo, resumen)}</div>
+        <div class="rejilla rejilla--2" style="align-items:start">${panelEvolucion(ctx, periodo)}${panelActividad(ctx)}</div>
+      </div></div>`;
 
-    const orden = ORDEN_APLICACION.map((r, i) => `${i ? ico('arrow-right') : ''}${chipRegla2(r)}`).join(' ');
-    const glosario = GLOSARIO.map(([t, d]) => `<div><dt>${esc(t)}</dt><dd>${esc(d)}</dd></div>`).join('');
-
-    return {
-      html: `<div class="pagina">
-        ${encabezado({
-          titulo: 'Voltia: comisiones que se pueden explicar',
-          descripcion: 'Un sistema de gestión de comisiones para una cadena de retail ficticia, con 14 tiendas y unos 180 vendedores de piso. Esta muestra tiene 4 tiendas y 47 vendedores.',
-        })}
-        <div class="pila">
-          ${panel({
-            titulo: 'El problema que resuelve',
-            cuerpo: `<p>Las comisiones viven en una hoja de cálculo que mantiene una sola persona. Cuando un vendedor reclama, nadie puede explicar su número sin rastrear fórmulas a mano. Cambiar una regla requiere a Sistemas y nadie sabe cuánto costará antes de aplicarla. Las devoluciones de meses anteriores se corrigen “a ojo”.</p>
-              <p>Voltia modela las reglas, los estados y los roles, y calcula cada cifra con los datos de ejemplo del caso. Todo lo que ves se puede recalcular.</p>`,
-          })}
-          <section aria-labelledby="h-momentos"><div class="seccion__titulo"><h2 id="h-momentos">Tres momentos de la historia</h2><p>Cambian el estado de todo el sistema. Los controles de la parte superior hacen lo mismo.</p></div>
-            <ol class="momentos">${momentos}</ol></section>
-          <section aria-labelledby="h-flujos"><div class="seccion__titulo"><h2 id="h-flujos">Casos para recorrer</h2><p>Cada uno abre la pantalla con el rol y el momento correctos.</p></div>
-            <ul class="flujos">${flujos}</ul></section>
-          ${panel({
-            titulo: 'El modelo en una línea',
-            subtitulo: 'Orden de aplicación de las reglas',
-            cuerpo: `<p class="fila" style="gap:6px">${orden}</p>
-              <p class="secundario pequeno" style="margin-top:12px">R-006 excluye antes que todo. R-001 fija la tasa por escalón sobre <em>toda</em> la venta. R-002 multiplica por categoría. R-005 marca el tope y lo escala. R-003 es un bono de equipo que se calcula en una segunda pasada. R-004 corrige períodos pagados con ajustes.</p>`,
-          })}
-          <details class="panel glosario"><summary>Glosario</summary><dl>${glosario}</dl></details>
-        </div></div>`,
-      acciones: {
-        momento(id) { ctx.acc.cambiarMomento(id); },
-        flujo(id) {
-          const f = FLUJOS.find((x) => x.id === id);
-          ctx.acc.cambiarMomento(f.momento);
-          ctx.acc.cambiarRol(f.rol);
-          if (f.vendedor) ctx.acc.cambiarVendedor(f.vendedor);
-          ctx.ir(f.ruta);
-        },
-      },
-    };
+    return { html, montar: (raiz) => enlazarSelectores(raiz), explicar: () => null };
   },
 };

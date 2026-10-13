@@ -8,10 +8,9 @@ export const ROLES = {
   gerente: { id: 'gerente', nombre: 'Gerente Comercial', corto: 'Gerente', persona: PERSONAS.gerente },
   contabilidad: { id: 'contabilidad', nombre: 'Contabilidad', corto: 'Contabilidad', persona: PERSONAS.contabilidad },
   auditoria: { id: 'auditoria', nombre: 'Auditoría', corto: 'Auditoría', persona: PERSONAS.auditoria },
-  vendedor: { id: 'vendedor', nombre: 'Vendedor', corto: 'Vendedor', persona: null },
 };
 
-export const ORDEN_ROLES = ['analista', 'jefe', 'gerente', 'contabilidad', 'auditoria', 'vendedor'];
+export const ORDEN_ROLES = ['analista', 'jefe', 'gerente', 'contabilidad', 'auditoria'];
 
 // acción → roles que pueden ejecutarla
 const MATRIZ = {
@@ -30,7 +29,6 @@ const MATRIZ = {
   'ajuste.autorizar': ['gerente'],
   'pago.exportar': ['contabilidad'],
   'pago.marcarPagado': ['contabilidad'],
-  'disputa.abrir': ['vendedor'],
   'disputa.resolver': ['analista'],
   'disputa.opinar': ['jefe'],
   'disputa.aprobar': ['gerente'],
@@ -53,7 +51,6 @@ const SOLO = {
   'ajuste.autorizar': 'Solo el Gerente Comercial autoriza ajustes mayores a Q1,000.',
   'pago.exportar': 'Solo Contabilidad exporta los pagos.',
   'pago.marcarPagado': 'Solo Contabilidad marca el período como pagado.',
-  'disputa.abrir': 'Solo el vendedor abre una disputa sobre su propio resultado.',
   'disputa.resolver': 'Solo el Analista de Compensaciones resuelve disputas.',
   'disputa.opinar': 'Solo el Jefe de tienda opina sobre una disputa de su tienda.',
   'disputa.aprobar': 'Solo el Gerente Comercial aprueba un ajuste que nace de una disputa.',
@@ -69,11 +66,9 @@ export function motivoSinPermiso(accion) {
 }
 
 /** Quién puede ver resultados de qué vendedores. */
-export function veResultadosDe({ rol, tiendaJefe, vendedorActivo }, vendedorId, tiendaId) {
-  if (['analista', 'gerente', 'contabilidad', 'auditoria'].includes(rol)) return true;
+export function veResultadosDe({ rol, tiendaJefe }, tiendaId) {
   if (rol === 'jefe') return tiendaId === tiendaJefe;
-  if (rol === 'vendedor') return vendedorId === vendedorActivo;
-  return false;
+  return true;
 }
 
 export function veAuditoria(rol) {
@@ -81,61 +76,89 @@ export function veAuditoria(rol) {
 }
 
 // ---------- Navegación por rol ----------
+// Cada rol ve solo las secciones que le corresponden. Una sección agrupa pantallas hermanas (pestañas).
 
-const item = (ruta, texto, icono, codigo) => ({ ruta, texto, icono, codigo });
-
-export const NAVEGACION = {
-  analista: [
-    { grupo: 'Reglas', items: [item('#/reglas', 'Lista de reglas', 'list-ordered', 'P01'), item('#/regla/R-001', 'Constructor', 'sliders-horizontal', 'P02'), item('#/simulador', 'Simulador', 'calculator', 'P10')] },
-    { grupo: 'Períodos', items: [item('#/periodos', 'Período y corrida', 'play', 'P04'), item('#/tienda', 'Revisión de tienda', 'store', 'P05'), item('#/detalle/E-1201', 'Detalle de comisión', 'receipt-text', 'P03')] },
-    { grupo: 'Correcciones', items: [item('#/ajustes', 'Ajustes', 'git-compare', 'P09'), item('#/disputas', 'Disputas', 'message-square', 'P08')] },
-    { grupo: 'Rastro', items: [item('#/auditoria', 'Historial', 'history', 'P12')] },
-  ],
-  jefe: [
-    { grupo: 'Mi tienda', items: [item('#/tienda', 'Revisión de tienda', 'store', 'P05'), item('#/disputas', 'Disputas de mi tienda', 'message-square', 'P08')] },
-    { grupo: 'Rastro', items: [item('#/auditoria', 'Historial de mi tienda', 'history', 'P12')] },
-  ],
-  gerente: [
-    { grupo: 'Decisiones', items: [item('#/aprobacion', 'Aprobación del período', 'badge-check', 'P06'), item('#/ajustes', 'Ajustes y excepciones', 'git-compare', 'P09')] },
-    { grupo: 'Consulta', items: [item('#/periodos', 'Período y corrida', 'play', 'P04'), item('#/tienda', 'Tiendas', 'store', 'P05'), item('#/reglas', 'Reglas', 'list-ordered', 'P01'), item('#/disputas', 'Disputas', 'message-square', 'P08')] },
-    { grupo: 'Rastro', items: [item('#/auditoria', 'Historial', 'history', 'P12')] },
-  ],
-  contabilidad: [
-    { grupo: 'Pagos', items: [item('#/pagos', 'Pagos', 'banknote', 'P07')] },
-    { grupo: 'Consulta', items: [item('#/periodos', 'Período y corrida', 'play', 'P04'), item('#/tienda', 'Tiendas', 'store', 'P05')] },
-    { grupo: 'Rastro', items: [item('#/auditoria', 'Historial', 'history', 'P12')] },
-  ],
-  auditoria: [
-    { grupo: 'Rastro', items: [item('#/auditoria', 'Historial', 'history', 'P12')] },
-    { grupo: 'Solo lectura', items: [item('#/reglas', 'Reglas', 'list-ordered', 'P01'), item('#/periodos', 'Período y corrida', 'play', 'P04'), item('#/tienda', 'Tiendas', 'store', 'P05'), item('#/ajustes', 'Ajustes', 'git-compare', 'P09'), item('#/disputas', 'Disputas', 'message-square', 'P08')] },
-  ],
-  vendedor: [
-    { grupo: 'Mi comisión', items: [item('#/mi-comision', 'Mi comisión', 'wallet', 'P11'), item('#/disputas', 'Mis disputas', 'message-square', 'P08')] },
-  ],
+const RUTAS = {
+  analista: ['inicio', 'reglas', 'regla', 'simulador', 'periodos', 'tienda', 'detalle', 'ajustes', 'ajuste', 'disputas', 'disputa', 'auditoria'],
+  jefe: ['inicio', 'tienda', 'detalle', 'disputas', 'disputa', 'auditoria'],
+  gerente: ['inicio', 'aprobacion', 'periodos', 'tienda', 'detalle', 'ajustes', 'ajuste', 'disputas', 'disputa', 'reglas', 'regla', 'auditoria'],
+  contabilidad: ['inicio', 'pagos', 'periodos', 'tienda', 'detalle', 'auditoria'],
+  auditoria: ['inicio', 'auditoria', 'reglas', 'regla', 'periodos', 'tienda', 'detalle', 'ajustes', 'ajuste', 'disputas', 'disputa'],
 };
 
 /** Rutas permitidas por rol (primer segmento del hash). */
 export function rutasPermitidas(rol) {
-  const base = new Set(['inicio', 'sistema']);
-  for (const g of NAVEGACION[rol]) for (const i of g.items) base.add(i.ruta.replace('#/', '').split('/')[0]);
-  if (rol === 'analista' || rol === 'gerente' || rol === 'auditoria') {
-    base.add('detalle');
-    base.add('ajuste');
-    base.add('disputa');
-    base.add('regla');
-  }
-  if (rol === 'jefe') {
-    base.add('detalle');
-    base.add('disputa');
-  }
-  if (rol === 'contabilidad') base.add('detalle');
-  if (rol === 'vendedor') {
-    base.add('disputa');
-    base.add('detalle');
-  }
-  return base;
+  return new Set(RUTAS[rol]);
 }
 
+// Pestañas de las secciones con varias pantallas.
+export const SECCIONES = {
+  periodo: {
+    etiqueta: 'Secciones del período',
+    pestanas: [
+      { ruta: 'periodos', texto: 'Corrida', activas: ['periodos'] },
+      { ruta: 'tienda', texto: 'Tiendas', activas: ['tienda'] },
+      { ruta: 'aprobacion', texto: 'Aprobación', activas: ['aprobacion'] },
+      { ruta: 'pagos', texto: 'Pagos', activas: ['pagos'] },
+    ],
+  },
+  correcciones: {
+    etiqueta: 'Correcciones',
+    pestanas: [
+      { ruta: 'ajustes', texto: 'Ajustes', activas: ['ajustes', 'ajuste'] },
+      { ruta: 'disputas', texto: 'Disputas', activas: ['disputas', 'disputa'] },
+    ],
+  },
+};
+
+export function seccionDe(ruta) {
+  return Object.entries(SECCIONES).find(([, s]) => s.pestanas.some((p) => p.activas.includes(ruta)))?.[0] ?? null;
+}
+
+/** Pestañas que el rol puede abrir dentro de una sección. */
+export function pestanasDe(rol, seccion) {
+  const permitidas = rutasPermitidas(rol);
+  return SECCIONES[seccion].pestanas.filter((p) => permitidas.has(p.ruta));
+}
+
+const item = (ruta, texto, icono, activas = [ruta]) => ({ ruta: `#/${ruta}`, texto, icono, activas });
+
+export const NAVEGACION = {
+  analista: [
+    item('inicio', 'Inicio', 'layout-dashboard'),
+    item('reglas', 'Reglas', 'list-ordered', ['reglas', 'regla']),
+    item('simulador', 'Simulador', 'calculator'),
+    item('periodos', 'Período', 'play', ['periodos', 'tienda', 'detalle']),
+    item('ajustes', 'Correcciones', 'git-compare', ['ajustes', 'ajuste', 'disputas', 'disputa']),
+    item('auditoria', 'Historial', 'history'),
+  ],
+  jefe: [
+    item('inicio', 'Inicio', 'layout-dashboard'),
+    item('tienda', 'Mi tienda', 'store', ['tienda', 'detalle']),
+    item('disputas', 'Disputas', 'message-square', ['disputas', 'disputa']),
+    item('auditoria', 'Historial', 'history'),
+  ],
+  gerente: [
+    item('inicio', 'Inicio', 'layout-dashboard'),
+    item('aprobacion', 'Período', 'badge-check', ['aprobacion', 'periodos', 'tienda', 'detalle']),
+    item('ajustes', 'Correcciones', 'git-compare', ['ajustes', 'ajuste', 'disputas', 'disputa']),
+    item('reglas', 'Reglas', 'list-ordered', ['reglas', 'regla']),
+    item('auditoria', 'Historial', 'history'),
+  ],
+  contabilidad: [
+    item('inicio', 'Inicio', 'layout-dashboard'),
+    item('pagos', 'Período', 'banknote', ['pagos', 'periodos', 'tienda', 'detalle']),
+    item('auditoria', 'Historial', 'history'),
+  ],
+  auditoria: [
+    item('inicio', 'Inicio', 'layout-dashboard'),
+    item('auditoria', 'Historial', 'history'),
+    item('reglas', 'Reglas', 'list-ordered', ['reglas', 'regla']),
+    item('periodos', 'Período', 'play', ['periodos', 'tienda', 'detalle']),
+    item('ajustes', 'Correcciones', 'git-compare', ['ajustes', 'ajuste', 'disputas', 'disputa']),
+  ],
+};
+
 export const INICIO_POR_ROL = {
-  analista: '#/periodos', jefe: '#/tienda', gerente: '#/aprobacion', contabilidad: '#/pagos', auditoria: '#/auditoria', vendedor: '#/mi-comision',
+  analista: '#/inicio', jefe: '#/inicio', gerente: '#/inicio', contabilidad: '#/inicio', auditoria: '#/inicio',
 };

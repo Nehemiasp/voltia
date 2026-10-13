@@ -130,7 +130,7 @@ function aplicacionHtml(a, info) {
   const tabla = `<table class="comparador"><thead><tr><th scope="col">Concepto</th><th scope="col"><span class="solo-lectores">Monto</span></th></tr></thead><tbody>${filas.map(([t, v, tipo]) => `<tr class="${tipo === 'total' ? 'total' : tipo === 'alerta' ? 'sub' : ''}"><td>${t.includes('Límite') ? t : esc(t)}</td><td class="${tipo === 'resta' ? 'cambio' : tipo === 'suma' ? 'cambio cambio--sube' : ''}">${q(v, tipo === 'suma' || tipo === 'resta' ? { signo: true } : undefined)}</td></tr>`).join('')}
     ${ap.saldo > 0 ? `<tr class="sub"><td>Saldo pendiente para ${esc(nombrePeriodo(sigPeriodo(a.periodoAplicacion)))}</td><td class="cambio">${q(ap.saldo)}</td></tr>` : ''}</tbody></table>`;
   const nota2 = ap.saldo > 0
-    ? nota('aviso', `<strong>Un descuento no puede dejar a ${esc(VENDEDOR[a.vendedorId].nombre.split(' ')[0])} sin ingreso.</strong><p>Se descuentan ${q(Math.abs(ap.aplicado))} en ${esc(nombrePeriodo(a.periodoAplicacion))} y los ${q(ap.saldo)} restantes pasan al período siguiente, con el mismo límite (D-05).</p>`)
+    ? nota('aviso', `<strong>Un descuento no puede dejar a ${esc(VENDEDOR[a.vendedorId].nombre.split(' ')[0])} sin ingreso.</strong><p>Se descuentan ${q(Math.abs(ap.aplicado))} en ${esc(nombrePeriodo(a.periodoAplicacion))} y los ${q(ap.saldo)} restantes pasan al período siguiente, con el mismo límite.</p>`)
     : '';
   return `${medidor}${tabla}${nota2}`;
 }

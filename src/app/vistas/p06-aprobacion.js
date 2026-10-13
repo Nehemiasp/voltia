@@ -123,7 +123,7 @@ export default {
       const { confirmado, valor } = await confirmar({
         titulo: autorizar ? `Autorizar la excepción de tope de ${VENDEDOR[vid].nombre}` : `Limitar la comisión de ${VENDEDOR[vid].nombre} al tope`,
         resumen: [['Comisión calculada', q(r.comisionBase)], ['Tope', q(r.tope.limite)], ['Exceso', q(r.tope.exceso)], ['Se pagará', q(autorizar ? r.total : r.total - r.tope.exceso)]],
-        aviso: { variante: 'aviso', html: autorizar ? 'Es una decisión de negocio que corresponde a una persona (D-04). Queda registrada con tu nombre.' : `No se pagarán ${q(r.tope.exceso)} de esta comisión.` },
+        aviso: { variante: 'aviso', html: autorizar ? 'Es una decisión de negocio que corresponde a una persona. Queda registrada con tu nombre.' : `No se pagarán ${q(r.tope.exceso)} de esta comisión.` },
         campo: { etiqueta: 'Motivo', requerido: false, placeholder: 'Opcional, pero ayuda a Auditoría.' },
         textoConfirmar: autorizar ? 'Autorizar excepción' : `Limitar a ${fmtQ(r.tope.limite)}`, peligro: !autorizar,
       });
@@ -141,7 +141,7 @@ export default {
         async 'regla-aprobar'(id) {
           const b = ctx.st.reglas.versiones.find((r) => r.id === id && r.estado === 'borrador' && r.pendienteAprobacion);
           const { confirmado } = await confirmar({
-            titulo: `Aprobar la activación de ${id} v${b.version}`, descripcion: 'El Analista prepara y tú apruebas: un error de configuración afecta a 180 personas (D-10).',
+            titulo: `Aprobar la activación de ${id} v${b.version}`, descripcion: 'El Analista prepara y tú apruebas: un error de configuración afecta a 180 personas.',
             resumen: [['Regla', esc(`${b.id} v${b.version} · ${b.nombre}`)], ['Cálculo', esc(b.calculo)], ['Vigente desde', esc(b.vigenciaDesde)], ['Fuente', esc(b.fuente)]], textoConfirmar: 'Aprobar activación',
           });
           if (!confirmado) return;

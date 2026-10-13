@@ -19,10 +19,7 @@ npm start         # servidor estático en http://localhost:5173 (los módulos ES
 npm test          # pruebas del motor de cálculo (sin navegador)
 npm run lint      # variables sin uso e indefinidas
 npm run e2e       # recorridos completos con Chromium (requiere npm start)
-npm run revision  # scroll horizontal, h1, alt y consola en 4 anchos y 24 pantallas (requiere npm start)
-npm run capturas  # imágenes del portafolio en portafolio/img (requiere npm start)
-npm run secuencia # video de la secuencia de Marta (requiere npm start)
-npm run caso      # regenera caso/index.html
+npm run revision  # scroll horizontal, h1, alt y consola en 4 anchos y 20 pantallas (requiere npm start)
 ```
 
 ## Estructura
@@ -31,4 +28,4 @@ npm run caso      # regenera caso/index.html
 - `src/app/` carcasa, estado, permisos, selectores, acciones y vistas (`vistas/pXX-*.js`).
 - `src/styles/` tokens, base, componentes y vistas.
 - `docs/` decisiones, modelo, especificaciones, sistema, caso y entrega.
-- `caso/` página del caso de estudio. `portafolio/` imágenes y video.
+- `caso/` y `portafolio/`: página del caso de estudio con imágenes de una versión anterior de la interfaz (no se regeneran).

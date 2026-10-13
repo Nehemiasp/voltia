@@ -60,7 +60,7 @@ export default {
     const html = `<div class="pagina">
       ${encabezado({ titulo: 'Reglas de comisión', descripcion: 'Nada se borra: toda regla se versiona. Editar una regla vigente crea una versión nueva en borrador.', acciones: editable ? boton({ texto: 'Editar R-001', clase: 'btn--primario', icono: 'pencil', href: '#/regla/R-001' }) : '' })}
       <div class="pila">
-        ${pendientes.length ? nota('aviso', `<strong>${pendientes.length} activación${pendientes.length > 1 ? 'es' : ''} esperan la aprobación del Gerente Comercial:</strong> ${pendientes.map((r) => `<a href="#/regla/${r.id}">${esc(r.id)} v${r.version}</a>`).join(', ')}. Un error de configuración afectaría a 180 personas (D-10).`) : ''}
+        ${pendientes.length ? nota('aviso', `<strong>${pendientes.length} activación${pendientes.length > 1 ? 'es' : ''} esperan la aprobación del Gerente Comercial:</strong> ${pendientes.map((r) => `<a href="#/regla/${r.id}">${esc(r.id)} v${r.version}</a>`).join(', ')}. Un error de configuración afectaría a 180 personas.`) : ''}
         ${panel({ titulo: 'Orden de aplicación', subtitulo: 'Cada venta pasa por las reglas en este orden. El orden importa: R-006 excluye antes de que R-001 calcule.', cuerpo: orden })}
         <section class="panel"><div class="tabla-barra"><div><h2 style="font-size:var(--t-m)">Versiones</h2></div>${filtros}</div>${tabla}</section>
       </div></div>`;

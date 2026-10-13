@@ -91,22 +91,21 @@ export default {
   id: 'detalle',
   titulo: 'Detalle de comisión',
   render(ctx) {
-    const vendedorId = ctx.param ?? ctx.st.vendedorActivo;
+    const vendedorId = ctx.param;
     const v = VENDEDOR[vendedorId];
     if (!v) return { html: sinAcceso(ctx, 'No encontramos a este vendedor.') };
     const periodo = periodoDe(ctx);
     const reg = periodoRegistro(periodo);
     const r0 = hayResultados(periodo) ? resultado(vendedorId, periodo) : null;
     const tiendaId = r0?.tienda ?? v.tienda;
-    if (!veResultadosDe({ rol: ctx.rol, tiendaJefe: ctx.st.tiendaJefe, vendedorActivo: ctx.st.vendedorActivo }, vendedorId, tiendaId)) {
-      return { html: sinAcceso(ctx, ctx.rol === 'jefe' ? 'Un Jefe de tienda ve solo los resultados de su tienda.' : 'Un vendedor ve solo su propio resultado.') };
+    if (!veResultadosDe({ rol: ctx.rol, tiendaJefe: ctx.st.tiendaJefe }, tiendaId)) {
+      return { html: sinAcceso(ctx, 'Un Jefe de tienda ve solo los resultados de su tienda.') };
     }
     if (!r0) {
       return { html: `<div class="pagina">${encabezado({ titulo: esc(v.nombre), migas: migas('Detalle'), acciones: selectorPeriodo(ctx, periodo, { conResultados: false }) })}
         ${estadoVista('vacio', { titulo: hayResultados(periodo) ? `${v.nombre} no figura en ${nombrePeriodo(periodo)}` : `${nombrePeriodo(periodo)} todavía no se calcula`, texto: hayResultados(periodo) ? 'Esta persona aún no había ingresado en ese período.' : `El período está “${estadoPeriodo(periodo)}”. El detalle aparece cuando el Analista ejecuta la corrida.` })}</div>` };
     }
 
-    const simple = ctx.rol === 'vendedor';
     const modo = ctx.query.m === 'hoy' && hayDevolucionPosterior(vendedorId, periodo) ? 'hoy' : 'pagado';
     const r = modo === 'hoy' ? resultadoRecalculado(vendedorId, periodo) : r0;
     const config = configDe(periodo);
@@ -127,18 +126,18 @@ export default {
 
     // ----- avisos de contexto -----
     const avisos = [];
-    if (devolucion && ctx.rol !== 'vendedor') {
+    if (devolucion) {
       const dev = ventasDe(vendedorId, periodo).find((l) => l.estado === 'devuelta');
       avisos.push(nota('aviso', `<strong>${esc(dev.id)} se devolvió el ${esc(fmtFechaLarga(dev.fechaDevolucion).replace(/ de \d{4}$/, ''))}.</strong>
-        <p>Este resultado se pagó con la corrida del ${esc(fmtFechaLarga(corteDe(periodo)))} y un período pagado no se reabre (D-02). La diferencia se corrige con ${ajustes.length ? `el ajuste <a href="#/ajuste/${esc(ajustes[0].id)}">${esc(ajustes[0].id)}</a>` : 'un ajuste en el período abierto más cercano'}.</p>`));
+        <p>Este resultado se pagó con la corrida del ${esc(fmtFechaLarga(corteDe(periodo)))} y un período pagado no se reabre. La diferencia se corrige con ${ajustes.length ? `el ajuste <a href="#/ajuste/${esc(ajustes[0].id)}">${esc(ajustes[0].id)}</a>` : 'un ajuste en el período abierto más cercano'}.</p>`));
     }
     if (obsAbiertas.length) {
-      avisos.push(nota('negativo', `<strong>Observada por ${esc(obsAbiertas[0].por)}.</strong><p>${esc(obsAbiertas[0].motivo)}</p><p class="diminuto secundario">La observación bloquea la aprobación de este vendedor, no la del resto de la tienda (D-06).</p>`));
+      avisos.push(nota('negativo', `<strong>Observada por ${esc(obsAbiertas[0].por)}.</strong><p>${esc(obsAbiertas[0].motivo)}</p><p class="diminuto secundario">La observación bloquea la aprobación de este vendedor, no la del resto de la tienda.</p>`));
     }
-    if (r.tope.excede && ctx.rol !== 'vendedor') {
+    if (r.tope.excede) {
       avisos.push(nota(decision ? 'info' : 'aviso', decision
         ? `<strong>Comisión sobre el tope: ${decision.decision === 'autorizar' ? 'autorizada' : 'limitada al tope'} por ${esc(decision.por)}.</strong>${decision.comentario ? `<p>${esc(decision.comentario)}</p>` : ''}`
-        : `<strong>Requiere autorización.</strong><p>La comisión de ${q(r.comisionBase)} supera el tope de ${q(r.tope.limite)} por ${q(r.tope.exceso)}. No se recorta: pasa a la bandeja del Gerente Comercial (D-04).</p>`));
+        : `<strong>Requiere autorización.</strong><p>La comisión de ${q(r.comisionBase)} supera el tope de ${q(r.tope.limite)} por ${q(r.tope.exceso)}. No se recorta: pasa a la bandeja del Gerente Comercial.</p>`));
     }
     if (ctx.rol === 'auditoria') avisos.push(nota('info', '<strong>Vista de solo lectura.</strong> Los números son los de la corrida; nada de aquí se puede modificar.'));
 
@@ -154,28 +153,28 @@ export default {
       acciones.push(boton({ texto: `Limitar a ${fmtQ(r.tope.limite)}`, icono: 'scale', accion: 'tope-limitar' }));
     }
     if (ctx.rol === 'analista' && devolucion && !ajustes.length) acciones.push(boton({ texto: 'Preparar ajuste', clase: 'btn--primario', icono: 'git-compare', accion: 'preparar-ajuste', foco: 'preparar-ajuste' }));
-    if (ajustes.length && !simple) acciones.push(boton({ texto: `Ver ajuste ${ajustes[0].id}`, icono: 'git-compare', href: `#/ajuste/${ajustes[0].id}` }));
+    if (ajustes.length) acciones.push(boton({ texto: `Ver ajuste ${ajustes[0].id}`, icono: 'git-compare', href: `#/ajuste/${ajustes[0].id}` }));
     if (r.bloqueado && ctx.rol === 'analista') acciones.push(boton({ texto: 'Cargar la meta', clase: 'btn--primario', icono: 'flag', href: `#/periodos?p=${periodo}` }));
 
     // ----- bloques -----
-    const pestanasModo = devolucion && !simple
+    const pestanasModo = devolucion
       ? `<div class="pestanas" role="tablist" aria-label="Versión del resultado">
           <a role="tab" href="#/detalle/${vendedorId}?p=${periodo}" ${modo === 'pagado' ? 'aria-current="page"' : ''}>Como se pagó (corrida del ${esc(fmtFecha(corteDe(periodo)))})</a>
           <a role="tab" href="#/detalle/${vendedorId}?p=${periodo}&m=hoy" ${modo === 'hoy' ? 'aria-current="page"' : ''}>Recalculado con lo que sabemos hoy</a></div>` : '';
 
     const resumen = `<div class="panel"><div class="panel__cuerpo"><div class="datos-fila">
-      ${dato(simple ? 'Tu comisión del período' : 'Total del período', explicable('total', q(r.total)), r.tope.excede && pago.retenido > 0 ? `${q(pago.retenido)} ${decision ? 'retenidos' : 'pendientes de autorización'}` : estado === 'pagada' || estado === 'ajustada' ? 'Ya pagado' : '', { grande: true })}
+      ${dato('Total del período', explicable('total', q(r.total)), r.tope.excede && pago.retenido > 0 ? `${q(pago.retenido)} ${decision ? 'retenidos' : 'pendientes de autorización'}` : estado === 'pagada' || estado === 'ajustada' ? 'Ya pagado' : '', { grande: true })}
       ${dato('Venta comisionable', explicable('comisionable', q(r.netoComisionable)), r.excluidas.length || r.devueltas.length ? `${r.excluidas.length + r.devueltas.length} venta${r.excluidas.length + r.devueltas.length > 1 ? 's' : ''} fuera, con su motivo` : 'Todas las ventas cuentan')}
       ${r.bloqueado ? dato('Cumplimiento', '<span class="aviso-texto">Sin meta</span>', 'No se asignó 0 %') : dato('Cumplimiento', explicable('cumplimiento', pct(r.cumplimiento)), `Meta ${q(meta)}`)}
-      ${r.bloqueado ? '' : dato('Tasa del escalón', explicable('tasa', pct(r.tasa)), simple ? 'Aplica a todo lo que vendiste' : 'Sobre toda la venta comisionable')}
-      ${simple ? '' : dato('Corrida y reglas', `<span class="mono">${esc(corrida?.id ?? '—')}</span>`, `Reglas ${esc(corrida?.version ?? '')} · ${esc(corrida ? fmtFecha(corrida.fecha) : '')}`)}
+      ${r.bloqueado ? '' : dato('Tasa del escalón', explicable('tasa', pct(r.tasa)), 'Sobre toda la venta comisionable')}
+      ${dato('Corrida y reglas', `<span class="mono">${esc(corrida?.id ?? '—')}</span>`, `Reglas ${esc(corrida?.version ?? '')} · ${esc(corrida ? fmtFecha(corrida.fecha) : '')}`)}
     </div></div></div>`;
 
     const bloqueCumplimiento = r.bloqueado
       ? nota('aviso', `<strong>Bloqueada: falta meta.</strong><p>${esc(v.nombre)} no tiene una meta cargada para ${esc(nombrePeriodo(periodo))}. La corrida no le asigna 0 %: queda a la espera de que el Analista cargue la meta y ejecute la corrida de nuevo.</p>`)
       : `${barraCumplimiento({ cumplimiento: r.cumplimiento, escalones: config.R001.escalones })}
-        <p class="frase-destacada"><strong>${simple ? `Tu tasa de ${pct(r.tasa)} se aplica a todo lo que vendiste este mes.` : `La tasa de ${pct(r.tasa)} se aplica a toda la venta comisionable del período, no solo al excedente sobre la meta.`}</strong>
-        ${siguiente ? ` ${simple ? 'Te faltaron' : 'Faltaron'} ${q(faltaSiguiente)} para el escalón de ${pct(siguiente.desde)} (${pct(siguiente.tasa)}).` : ' Ya está en el escalón más alto.'}</p>`;
+        <p class="frase-destacada"><strong>La tasa de ${pct(r.tasa)} se aplica a toda la venta comisionable del período, no solo al excedente sobre la meta.</strong>
+        ${siguiente ? ` Faltaron ${q(faltaSiguiente)} para el escalón de ${pct(siguiente.desde)} (${pct(siguiente.tasa)}).` : ' Ya está en el escalón más alto.'}</p>`;
 
     const bloqueCascada = r.bloqueado ? '' : panel({
       titulo: 'De lo vendido a la comisión', subtitulo: 'Regla por regla, en el orden de aplicación. Pulsa un número para ver de dónde sale.',
@@ -184,13 +183,13 @@ export default {
 
     const filtros = `<div class="tabla-filtros"><label class="opcion" style="font-size:var(--t-s)"><input type="checkbox" id="agrupar" ${agrupar ? 'checked' : ''}> Agrupar por categoría</label></div>`;
     const bloqueVentas = panel({
-      titulo: 'Ventas del período', subtitulo: `${lineasDelDetalle(r).length} ventas registradas. Las excluidas y devueltas se muestran atenuadas, con su motivo (D-03).`,
+      titulo: 'Ventas del período', subtitulo: `${lineasDelDetalle(r).length} ventas registradas. Las excluidas y devueltas se muestran atenuadas, con su motivo.`,
       acciones: filtros, cuerpo: tablaVentas(r, agrupar), sinRelleno: true,
     });
 
-    const bloqueHistorial = simple ? '' : panel({ titulo: 'Historial de este resultado', cuerpo: historial(vendedorId, periodo) });
+    const bloqueHistorial = panel({ titulo: 'Historial de este resultado', cuerpo: historial(vendedorId, periodo) });
 
-    const migasHtml = migas(simple ? 'Mi comisión' : 'Resultados', esc(nombrePeriodo(periodo)), esc(v.nombre));
+    const migasHtml = migas('Resultados', esc(nombrePeriodo(periodo)), esc(v.nombre));
     const html = `<div class="pagina">
       ${encabezado({
         titulo: `${esc(v.nombre)} <span class="secundario" style="font-weight:400">· ${esc(tienda.nombre)}</span>`,
@@ -202,7 +201,7 @@ export default {
         ${avisos.join('')}${pestanasModo}
         ${resumen}
         ${panel({ titulo: 'Cumplimiento de la meta', cuerpo: bloqueCumplimiento })}
-        <div class="rejilla ${simple || r.bloqueado ? '' : 'rejilla--principal-ancha'}">
+        <div class="rejilla ${r.bloqueado ? '' : 'rejilla--principal-ancha'}">
           ${bloqueCascada}
           ${bloqueHistorial}
         </div>
@@ -241,7 +240,7 @@ export default {
           const { confirmado, valor } = await confirmar({
             titulo: `Autorizar la excepción de tope de ${v.nombre}`,
             resumen: [['Comisión', q(r.comisionBase)], ['Tope', q(r.tope.limite)], ['Exceso que se autoriza', q(r.tope.exceso)], ['Se pagará', q(r.total)]],
-            aviso: { variante: 'aviso', html: 'Es una decisión de negocio que corresponde a una persona (D-04). Queda registrada con tu nombre.' },
+            aviso: { variante: 'aviso', html: 'Es una decisión de negocio que corresponde a una persona. Queda registrada con tu nombre.' },
             campo: { etiqueta: 'Motivo', requerido: false, placeholder: 'Por ejemplo: la campaña de electrónica superó lo previsto.' },
             textoConfirmar: 'Autorizar excepción',
           });

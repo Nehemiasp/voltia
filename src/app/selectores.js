@@ -1,7 +1,7 @@
 // Lecturas derivadas del estado. Todo lo que se muestra en pantalla sale de aquí o del motor: nada se copia a mano.
 
 import { obtener } from './estado.js';
-import { MOMENTOS, FECHA_CORRIDA } from './semillas.js';
+import { ESCENARIO, FECHA_CORRIDA } from './semillas.js';
 import { conjuntoDelPeriodo } from '../engine/reglas.js';
 import { calcularPeriodo, aplicarAjuste } from '../engine/calculo.js';
 import { VENDEDOR, TIENDA } from '../engine/datos.js';
@@ -14,8 +14,7 @@ export { LIMITE_AJUSTE_SIN_GERENTE };
 
 export const ESTADOS_PERIODO = ['Abierto', 'Cerrado a ventas', 'Calculado', 'En revisión', 'Aprobado', 'Pagado'];
 
-export const momentoActual = () => MOMENTOS[obtener().momento];
-export const periodoFoco = () => momentoActual().periodo;
+export const periodoFoco = () => ESCENARIO.periodo;
 export const fechaHoy = () => obtener().reloj.slice(0, 10);
 
 export function periodoRegistro(periodo) {

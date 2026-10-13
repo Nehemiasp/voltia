@@ -1,0 +1,98 @@
+/* Tokens de Voltia (sección 9.3 del documento maestro).
+   Todos los pares de texto/fondo usados aquí superan AA (4.5:1); los bordes de controles superan 3:1.
+   Los verificados están en docs/sistema.md. */
+
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../fonts/ibm-plex-sans-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../../fonts/ibm-plex-sans-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../../fonts/ibm-plex-sans-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../fonts/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../../fonts/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
+}
+
+:root {
+  /* Color */
+  --fondo: #f5f6f8;
+  --superficie: #ffffff;
+  --linea: #dce0e6;
+  --borde-control: #7c8696;
+  --texto: #161a22;
+  --texto-secundario: #5b6472;
+  --acento: #2e4fd6;
+  --acento-hover: #243fb0;
+  --acento-fondo: #e8edfc;
+  --positivo: #137a55;
+  --positivo-fondo: #e3f3ec;
+  --aviso: #9a5b00;
+  --aviso-fondo: #fbf0dc;
+  --negativo: #b42318;
+  --negativo-fondo: #fbe9e7;
+  --neutro-fondo: #eceef2;
+
+  /* Tipografía */
+  --fuente: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fuente-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --t-xs: 0.75rem; /* 12 */
+  --t-s: 0.875rem; /* 14 · tablas */
+  --t-m: 1rem; /* 16 · formularios y texto explicativo */
+  --t-l: 1.25rem; /* 20 */
+  --t-xl: 1.5rem; /* 24 */
+  --t-2xl: 2rem; /* 32 */
+  --t-3xl: 2.5rem; /* 40 */
+  --peso-normal: 400;
+  --peso-medio: 500;
+  --peso-fuerte: 600;
+
+  /* Retícula de 8 px */
+  --e-1: 4px;
+  --e-2: 8px;
+  --e-3: 12px;
+  --e-4: 16px;
+  --e-5: 24px;
+  --e-6: 32px;
+  --e-7: 48px;
+  --e-8: 64px;
+
+  /* Radios y sombras (solo menús, paneles laterales y modales) */
+  --radio-control: 4px;
+  --radio-panel: 8px;
+  --sombra-flotante: 0 8px 24px rgba(22, 26, 34, 0.16), 0 1px 3px rgba(22, 26, 34, 0.12);
+
+  /* Movimiento */
+  --rapido: 150ms;
+  --medio: 250ms;
+  --salida: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* Estructura */
+  --ancho-lateral: 232px;
+  --ancho-contenido: 1280px;
+  --alto-cabecera: 52px;
+}

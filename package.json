@@ -1,0 +1,16 @@
+{
+  "name": "voltia",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Voltia: sistema de gestión de comisiones. Proyecto conceptual con datos ficticios.",
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\"",
+    "start": "node tools/servir.mjs",
+    "capturas": "node tools/capturas.mjs",
+    "secuencia": "node tools/secuencia-marta.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.56.0"
+  }
+}

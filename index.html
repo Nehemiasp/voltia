@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Voltia · comisiones que se pueden explicar</title>
+  <meta name="description" content="Prototipo de Voltia, un sistema de gestión de comisiones para una cadena de retail ficticia: reglas configurables, cálculo con trazabilidad y ajustes retroactivos explicados.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Voltia · comisiones que se pueden explicar">
+  <meta property="og:description" content="Prototipo navegable de un sistema de comisiones con reglas, estados, roles y consecuencias en el tiempo. Proyecto conceptual con datos ficticios.">
+  <meta property="og:image" content="assets/og.png">
+  <meta name="theme-color" content="#f5f6f8">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://voltia.example/">
+  <link rel="preload" href="fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="src/styles/tokens.css">
+  <link rel="stylesheet" href="src/styles/base.css">
+  <link rel="stylesheet" href="src/styles/componentes.css">
+  <link rel="stylesheet" href="src/styles/vistas.css">
+</head>
+<body>
+  <a class="saltar" href="#principal" data-saltar>Saltar al contenido</a>
+  <header class="cabecera" id="cabecera"></header>
+  <div class="barra-demo" id="barra-demo" role="region" aria-label="Controles de la demostración"></div>
+  <div class="marco" id="marco">
+    <nav class="lateral" id="nav" aria-label="Navegación principal"></nav>
+    <main id="principal" tabindex="-1">
+      <noscript><div class="pagina"><h1>Voltia necesita JavaScript</h1><p>Este prototipo se ejecuta en el navegador. Activa JavaScript e inténtalo de nuevo.</p></div></noscript>
+    </main>
+  </div>
+  <aside class="lateral-detalle" id="panel-lateral" role="dialog" aria-modal="false" aria-labelledby="panel-titulo" aria-hidden="true"></aside>
+  <dialog id="dialogo"></dialog>
+  <div class="avisos" id="avisos" role="status" aria-live="polite"></div>
+  <script type="module" src="src/app/main.js"></script>
+</body>
+</html>

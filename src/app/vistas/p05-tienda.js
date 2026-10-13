@@ -2,8 +2,8 @@
 
 import { calculo, estadoPeriodo, estadoResultado, aPagar, observaciones, periodosConResultados } from '../selectores.js';
 import { TIENDAS, TIENDA, VENDEDOR } from '../../engine/datos.js';
-import { esc, nombrePeriodo, fmtQ, fmtPct } from '../../engine/formato.js';
-import { ico, chip, chipResultado, q, pct, panel, encabezado, dato, boton, thOrden, nota, estadoVista } from '../ui.js';
+import { esc, nombrePeriodo } from '../../engine/formato.js';
+import { chip, chipResultado, q, pct, panel, encabezado, dato, boton, thOrden, nota, estadoVista } from '../ui.js';
 import { puede } from '../permisos.js';
 import { periodoDe, selectorPeriodo, enlazarSelectores, migas, dialogoObservar } from './comun.js';
 
@@ -103,5 +103,3 @@ export default {
     };
   },
 };
-
-export { ico, fmtQ, fmtPct };

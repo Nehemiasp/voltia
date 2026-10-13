@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../src/styles/tokens.css">
+  <title>La hoja de cálculo de comisiones (ilustración del problema)</title>
+  <style>
+    :root { --texto: #1f2328; --linea: #c9ced6; --cab: #eef0f3; --aviso: #fff3c4; --rojo: #b42318; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 40px; background: #dfe3e8; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: var(--texto); }
+    .ventana { width: 1520px; margin: 0 auto; background: #fff; border: 1px solid var(--linea); border-radius: 8px; overflow: hidden; position: relative; }
+    .titulo { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: #f6f7f9; border-bottom: 1px solid var(--linea); font-size: 14px; }
+    .titulo strong { font-weight: 600; }
+    .titulo span { color: #6a717c; }
+    .formula { display: flex; gap: 12px; align-items: center; padding: 8px 20px; border-bottom: 1px solid var(--linea); font-size: 13px; background: #fff; }
+    .formula b { display: inline-block; padding: 2px 10px; background: var(--cab); border-radius: 4px; font-weight: 500; }
+    .formula code { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12.5px; color: #2b3138; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+    th, td { border: 1px solid var(--linea); padding: 6px 10px; text-align: right; white-space: nowrap; }
+    th { background: var(--cab); font-weight: 500; color: #4a515b; }
+    td:first-child, th:first-child { background: var(--cab); text-align: center; width: 44px; color: #6a717c; }
+    td.t { text-align: left; }
+    tr.marta td:not(:first-child) { background: var(--aviso); }
+    .nota { position: absolute; right: 60px; top: 320px; width: 380px; background: #fff; border: 2px solid var(--rojo); border-radius: 8px; padding: 14px 16px; font-size: 15px; line-height: 1.45; box-shadow: 0 10px 30px rgba(0,0,0,.18); }
+    .nota b { color: var(--rojo); }
+    .nota small { display: block; color: #6a717c; margin-top: 6px; font-size: 12.5px; }
+    .pestanas { display: flex; gap: 2px; padding: 0 20px; background: #f6f7f9; border-top: 1px solid var(--linea); font-size: 13px; }
+    .pestanas span { padding: 8px 14px; color: #4a515b; }
+    .pestanas span.on { background: #fff; border: 1px solid var(--linea); border-top: 0; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="ventana">
+    <div class="titulo"><strong>Comisiones_ENERO_FINAL_v7_(corregido)_NO_TOCAR.xlsx</strong><span>Última edición: una sola persona · hace 3 meses</span></div>
+    <div class="formula"><b>K14</b><code>=SI(Q14&gt;=1,2;N14*0,07;SI(Q14&gt;=1;N14*0,05;SI(Q14&gt;=0,8;N14*0,03;0)))*BUSCARV(D14;Hoja3!$A$2:$B$5;2;0)+SI(Y(R14&gt;=1;Q14&gt;=0,8);500;0)-Ajustes!G14</code></div>
+    <table>
+      <thead><tr><th></th><th>A · Vendedor</th><th>B · Tienda</th><th>C · Meta</th><th>D · Categoría</th><th>E · Venta neta</th><th>F · Cumplimiento</th><th>G · Tasa</th><th>H · Comisión</th><th>I · Bono</th><th>J · Ajuste</th><th>K · Total</th></tr></thead>
+      <tbody>
+        <tr><td>12</td><td class="t">Fernando Girón</td><td class="t">Galerías del Sur</td><td>150,000</td><td class="t">Mixta</td><td>189,000</td><td>126 %</td><td>7 %</td><td>14,136</td><td>500</td><td>0</td><td>14,636</td></tr>
+        <tr><td>13</td><td class="t">Elena Fuentes</td><td class="t">Galerías del Sur</td><td>150,000</td><td class="t">Mixta</td><td>181,500</td><td>121 %</td><td>7 %</td><td>13,520</td><td>500</td><td>0</td><td>14,020</td></tr>
+        <tr class="marta"><td>14</td><td class="t">Marta Ruiz</td><td class="t">Galerías del Sur</td><td>150,000</td><td class="t">Mixta</td><td>157,500</td><td>105 %</td><td>5 %</td><td>8,550</td><td>500</td><td>0</td><td>9,050</td></tr>
+        <tr><td>15</td><td class="t">Verónica Luna</td><td class="t">Galerías del Sur</td><td>150,000</td><td class="t">Mixta</td><td>147,000</td><td>98 %</td><td>3 %</td><td>4,822</td><td>500</td><td>0</td><td>5,322</td></tr>
+        <tr><td>16</td><td class="t">Natalia Recinos</td><td class="t">Galerías del Sur</td><td>150,000</td><td class="t">Mixta</td><td>141,000</td><td>94 %</td><td>3 %</td><td>4,480</td><td>500</td><td>0</td><td>4,980</td></tr>
+        <tr><td>17</td><td class="t">Gustavo Paz</td><td class="t">Galerías del Sur</td><td>145,000</td><td class="t">Mixta</td><td>107,300</td><td>74 %</td><td>0 %</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+        <tr><td>18</td><td class="t">Óscar Valdez</td><td class="t">Galerías del Sur</td><td>155,000</td><td class="t">Mixta</td><td>153,100</td><td>99 %</td><td>3 %</td><td>4,955</td><td>500</td><td>0</td><td>5,455</td></tr>
+        <tr><td>19</td><td class="t" colspan="11">…</td></tr>
+      </tbody>
+    </table>
+    <div class="pestanas"><span class="on">Enero</span><span>Febrero</span><span>Hoja3</span><span>Ajustes</span><span>Ajustes (copia)</span><span>Devoluciones ?</span></div>
+    <aside class="nota"><b>“¿Por qué me salió esto?”</b> Marta pregunta por su número.<small>Para responderle hay que abrir la fórmula de K14, seguir tres pestañas y rastrear las celdas a mano. Y si en marzo se devuelve una venta de enero, nadie sabe cuánto corregir.</small></aside>
+  </div>
+</body>
+</html>

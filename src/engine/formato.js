@@ -25,7 +25,7 @@ export function fmtPct(x, { fijo = false, decimales = 1 } = {}) {
   const f = 10 ** decimales;
   const r = Math.round(x * f) / f;
   const texto = fijo || !Number.isInteger(r) ? r.toFixed(decimales) : String(r);
-  return `${texto}${NBSP}%`;
+  return `${texto.replace('-', MENOS)}${NBSP}%`;
 }
 
 export function fmtNum(n) {

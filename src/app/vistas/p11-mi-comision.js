@@ -4,10 +4,9 @@ import { calculo, periodosDisponibles, estadoPeriodo, configDe, fechaHoy, result
 import { calcularVendedor, proyectar, recalcularRetroactivo } from '../../engine/calculo.js';
 import { ventasDe } from '../../engine/ventas.js';
 import { VENDEDOR, TIENDA } from '../../engine/datos.js';
-import { esc, fmtQ, fmtPct, fmtFecha, nombrePeriodo, diasDelMes, mesDe } from '../../engine/formato.js';
+import { esc, fmtPct, fmtFecha, nombrePeriodo, diasDelMes, mesDe } from '../../engine/formato.js';
 import { ico, chip, chipResultado, q, pct, nota, panel, boton, barraCumplimiento } from '../ui.js';
 import { aplicarAjuste } from '../../engine/calculo.js';
-import { corteDe } from '../selectores.js';
 
 const redondeo10 = (n) => Math.round(n / 10) * 10;
 
@@ -61,7 +60,7 @@ function explicacionAjuste(vendedorId, periodo, a) {
     return aplicarAjuste({ deuda: -a.montoSolicitado, comisionPeriodo: base, config: configDe(a.periodoAplicacion) });
   })() : null;
   if (a.tipo === 'devolucion' && dev && rr.cambioDeEscalon) {
-    return `<p>Se devolvió ${esc(dev.producto.toLowerCase())} que vendiste en ${esc(mesDe(periodo))}. Al bajar tu cumplimiento de ese mes de ${pct(rr.original.cumplimiento)} a ${pct(rr.recalculado.cumplimiento)}, la tasa pasó de ${pct(rr.original.tasa)} a ${pct(rr.recalculado.tasa)}.</p>
+    return `<p>Se devolvió «${esc(dev.producto)}», que vendiste en ${esc(mesDe(periodo))}. Al bajar tu cumplimiento de ese mes de ${pct(rr.original.cumplimiento)} a ${pct(rr.recalculado.cumplimiento)}, la tasa pasó de ${pct(rr.original.tasa)} a ${pct(rr.recalculado.tasa)}.</p>
       <ul class="formula"><li><span>Lo que valía esa venta</span><span>${q(Math.abs(rr.componentes.valorVentas))}</span></li><li><span>Efecto de la tasa nueva sobre el resto de tus ventas</span><span>${q(Math.abs(rr.componentes.efectoEscalon))}</span></li><li><span>Ajuste total</span><span>${q(a.montoSolicitado)}</span></li></ul>
       ${ap ? `<p>Para no dejarte sin ingreso, en ${esc(mesDe(a.periodoAplicacion))} se descuentan como máximo el 50 % de tu comisión: <strong>${q(Math.abs(ap.aplicado))}</strong>.${ap.saldo > 0 ? ` Los <strong>${q(ap.saldo)}</strong> restantes se descontarán en ${esc(mesDe(periodoSiguiente(a.periodoAplicacion)))}.` : ''}</p>` : ''}`;
   }
@@ -121,5 +120,3 @@ export default {
     return { html, titulo: 'Mi comisión' };
   },
 };
-
-export { corteDe, calculo };

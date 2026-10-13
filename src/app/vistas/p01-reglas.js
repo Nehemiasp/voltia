@@ -3,7 +3,7 @@
 import { obtener } from '../estado.js';
 import { ORDEN_APLICACION, TIPOS_REGLA } from '../../engine/reglas.js';
 import { esc, fmtFechaLarga } from '../../engine/formato.js';
-import { ico, chip, chipRegla, panel, encabezado, boton, nota, estadoVista, thOrden } from '../ui.js';
+import { ico, chipRegla, panel, encabezado, boton, nota, estadoVista, thOrden } from '../ui.js';
 import { puede } from '../permisos.js';
 
 const FILTROS_ESTADO = [
@@ -80,5 +80,3 @@ export default {
     };
   },
 };
-
-export { chip };

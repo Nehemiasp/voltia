@@ -12,6 +12,7 @@ import { VENDEDORES, VENDEDOR } from '../engine/datos.js';
 
 const raiz = document.getElementById('principal');
 let vistaActual = null;
+let demoAbierto = false;
 let ultimaRuta = null;
 
 // ---------- Ruta ----------
@@ -49,12 +50,15 @@ function renderBarraDemo() {
   const vendedores = st.rol === 'vendedor'
     ? `<label>Vendedor <select id="demo-vendedor">${VENDEDORES.map((v) => `<option value="${v.id}" ${v.id === st.vendedorActivo ? 'selected' : ''}>${esc(v.nombre)}</option>`).join('')}</select></label>` : '';
   const estados = `<label>Vista <select id="demo-estado">${[['', 'Con datos'], ['cargando', 'Cargando'], ['vacio', 'Vacío'], ['error', 'Error']].map(([v, t]) => `<option value="${v}" ${ruta.query.estado === v || (!ruta.query.estado && v === '') ? 'selected' : ''}>${t}</option>`).join('')}</select></label>`;
+  const abierto = demoAbierto || window.innerWidth >= 700;
   document.getElementById('barra-demo').innerHTML = `
     <span class="barra-demo__aviso">Proyecto conceptual. Voltia, sus datos y sus personas son ficticios.</span>
-    <label>Fecha <select id="demo-momento">${momentos}</select></label>
-    <label>Rol <select id="demo-rol">${roles}</select></label>
-    ${vendedores}${estados}
-    <button type="button" class="btn btn--s" id="demo-reiniciar">${ico('rotate-ccw')} Restablecer demo</button>`;
+    <details class="demo-det" ${abierto ? 'open' : ''}><summary>Controles de la demostración</summary><div class="demo-controles">
+      <label>Fecha <select id="demo-momento">${momentos}</select></label>
+      <label>Rol <select id="demo-rol">${roles}</select></label>
+      ${vendedores}${estados}
+      <button type="button" class="btn btn--s" id="demo-reiniciar">${ico('rotate-ccw')} Restablecer demo</button></div></details>`;
+  document.querySelector('.demo-det').addEventListener('toggle', (e) => { if (window.innerWidth < 700) demoAbierto = e.target.open; });
 }
 
 function renderNavegacion() {

@@ -1,13 +1,11 @@
 // P04 · Período y corrida de cálculo.
 
-import {
-  periodoRegistro, estadoPeriodo, resumenPeriodo, hayResultados, metasPendientes, observaciones, bloqueosAprobacion, ESTADOS_PERIODO,
-} from '../selectores.js';
+import { periodoRegistro, estadoPeriodo, resumenPeriodo, hayResultados, metasPendientes, observaciones } from '../selectores.js';
 import { CONJUNTOS, conjuntoDelPeriodo } from '../../engine/reglas.js';
 import { VENDEDOR } from '../../engine/datos.js';
-import { esc, fmtQ, fmtPct, fmtFecha, nombrePeriodo, fmtFechaHora } from '../../engine/formato.js';
+import { esc, fmtPct, fmtFecha, nombrePeriodo } from '../../engine/formato.js';
 import {
-  ico, chip, chipPeriodo, chipRegla2, q, pct, nota, panel, encabezado, dato, boton, motivoVisible, variacion, lineaEstados, estadoVista,
+  ico, chip, chipPeriodo, q, nota, panel, encabezado, dato, boton, motivoVisible, variacion, lineaEstados, estadoVista,
 } from '../ui.js';
 import { confirmar } from '../dialogos.js';
 import { puede, motivoSinPermiso } from '../permisos.js';
@@ -229,5 +227,3 @@ export default {
     };
   },
 };
-
-export { ESTADOS_PERIODO, fmtQ, fmtFechaHora, bloqueosAprobacion, pct, chipRegla2 };

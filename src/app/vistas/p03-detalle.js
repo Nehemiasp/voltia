@@ -2,21 +2,19 @@
 // Todos los roles con permiso ven la misma verdad con distinto nivel de detalle.
 
 import {
-  calculo, resultado, estadoResultado, corteDe, configDe, periodoRegistro, estadoPeriodo, hayResultados, observaciones, eventosDe,
-  decisionTope, aPagar, ajusteSobre, fechaHoy, metasDeCorrida, periodosConResultados,
+  resultado, estadoResultado, corteDe, configDe, periodoRegistro, estadoPeriodo, hayResultados, observaciones, eventosDe, decisionTope, aPagar, ajusteSobre, fechaHoy, metasDeCorrida,
 } from '../selectores.js';
 import { calcularPeriodo, construirCascada, recalcularRetroactivo } from '../../engine/calculo.js';
 import { VENDEDOR, TIENDA } from '../../engine/datos.js';
 import { ventasDe } from '../../engine/ventas.js';
 import { CATEGORIAS } from '../../engine/reglas.js';
-import { esc, fmtQ, fmtPct, fmtFecha, fmtFechaLarga, nombrePeriodo, mesDe } from '../../engine/formato.js';
+import { esc, fmtQ, fmtPct, fmtFecha, fmtFechaLarga, nombrePeriodo } from '../../engine/formato.js';
 import {
-  ico, chip, chipResultado, chipAjuste, q, pct, explicable, nota, panel, encabezado, dato, boton, motivoVisible, estadoVista,
-  barraCumplimiento, cascada, eventos, thOrden,
+  chip, chipResultado, q, pct, explicable, nota, panel, encabezado, dato, boton, estadoVista, barraCumplimiento, cascada, eventos, thOrden,
 } from '../ui.js';
 import { explicar, htmlExplicacion } from '../explicaciones.js';
 import { confirmar } from '../dialogos.js';
-import { veResultadosDe, puede, motivoSinPermiso } from '../permisos.js';
+import { veResultadosDe, puede } from '../permisos.js';
 import { periodoDe, selectorPeriodo, enlazarSelectores, migas, sinAcceso } from './comun.js';
 
 function hayDevolucionPosterior(vendedorId, periodo) {
@@ -277,5 +275,3 @@ export default {
     };
   },
 };
-
-export { mesDe, motivoSinPermiso, motivoVisible };

@@ -1,14 +1,13 @@
 // P02 · Constructor de reglas (edita R-001). Formulario estructurado con frase de lectura en vivo (D-08).
 
-import { obtener } from '../estado.js';
 import { borradorDe, reglaVigenteActual, versionesDeRegla } from '../acciones.js';
 import { fechaHoy, periodoRegistro, metasDeCorrida } from '../selectores.js';
-import { CONJUNTOS, RESPONSABLES, fraseEscalon } from '../../engine/reglas.js';
+import { CONJUNTOS, RESPONSABLES } from '../../engine/reglas.js';
 import { calcularPeriodo } from '../../engine/calculo.js';
-import { VENDEDOR, ID, TIENDAS } from '../../engine/datos.js';
+import { ID, TIENDAS } from '../../engine/datos.js';
 import { vendedoresDelPeriodo } from '../../engine/ventas.js';
-import { esc, fmtQ, fmtPct, fmtFechaLarga } from '../../engine/formato.js';
-import { ico, chip, chipRegla, q, pct, nota, panel, encabezado, boton, motivoVisible, variacion, estadoVista, fraseDeRegla } from '../ui.js';
+import { esc, fmtFechaLarga } from '../../engine/formato.js';
+import { ico, chip, q, pct, nota, panel, encabezado, boton, motivoVisible, variacion, estadoVista, fraseDeRegla } from '../ui.js';
 import { confirmar } from '../dialogos.js';
 import { puede, motivoSinPermiso } from '../permisos.js';
 import { validarBorrador, fechaMinimaVigencia, primerDiaMesSiguiente } from '../validacion.js';
@@ -339,5 +338,3 @@ export default {
     };
   },
 };
-
-export { VENDEDOR, fmtQ, fmtPct, chipRegla, obtener, fraseEscalon };

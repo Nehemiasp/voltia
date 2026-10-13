@@ -247,7 +247,7 @@
 .tabla-vacia { padding: var(--e-7) var(--e-4); text-align: center; }
 
 /* ---------- Barra de cumplimiento con escalones ---------- */
-.escala { width: 100%; }
+.escala { width: 100%; padding-bottom: 34px; }
 .escala__tramos { display: flex; gap: 2px; }
 .tramo {
   position: relative;
@@ -556,6 +556,17 @@ dialog::backdrop { background: rgba(22, 26, 34, 0.5); }
 .secuencia-pasos button.pasado { background: var(--positivo); }
 .secuencia-texto { font-size: var(--t-s); flex: 1; min-width: 220px; }
 .secuencia-texto strong { display: block; font-size: var(--t-m); }
-.sec-oculto { opacity: 0.18; filter: grayscale(1); pointer-events: none; transition: opacity var(--medio) var(--salida); }
-.sec-visible { transition: opacity var(--medio) var(--salida); }
+.sec-oculto { display: none; }
+.sec-nuevo { animation: entra 400ms var(--salida); }
+#bloque-antes, #bloque-separacion, #bloque-aplicacion { scroll-margin-top: 72px; }
 .sec-foco { box-shadow: 0 0 0 2px var(--acento); border-radius: var(--radio-panel); }
+
+/* Pantallas angostas: nada empuja el ancho de la página; lo ancho se desplaza dentro de su panel */
+#principal { min-width: 0; }
+.panel { min-width: 0; }
+.panel__cuerpo { overflow-x: auto; }
+@media (max-width: 640px) {
+  .paso { grid-template-columns: 52px minmax(0, 1fr) auto; }
+  .paso__barra { display: none; }
+  .impacto li { grid-template-columns: 1fr; gap: 2px; }
+}

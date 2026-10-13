@@ -4,16 +4,14 @@
 import {
   obtener
 } from '../estado.js';
-import {
-  calculo, resultado, hayResultados, periodoRegistro, estadoPeriodo, configDe, LIMITE_AJUSTE_SIN_GERENTE,
-} from '../selectores.js';
+import { resultado, hayResultados, periodoRegistro, estadoPeriodo, configDe, LIMITE_AJUSTE_SIN_GERENTE } from '../selectores.js';
 import { recalcularRetroactivo, aplicarAjuste } from '../../engine/calculo.js';
 import { ventasDe } from '../../engine/ventas.js';
 import { VENDEDOR, TIENDA } from '../../engine/datos.js';
 import { CATEGORIAS } from '../../engine/reglas.js';
-import { esc, fmtQ, fmtPct, fmtFecha, fmtFechaLarga, fmtFechaHora, nombrePeriodo } from '../../engine/formato.js';
+import { esc, fmtQ, fmtPct, fmtFecha, fmtFechaHora, nombrePeriodo } from '../../engine/formato.js';
 import {
-  ico, chip, chipAjuste, q, pct, nota, panel, encabezado, dato, boton, motivoVisible, estadoVista, barraCumplimiento, variacion, explicable,
+  ico, chip, chipAjuste, q, pct, nota, panel, encabezado, dato, boton, motivoVisible, estadoVista, barraCumplimiento, variacion,
 } from '../ui.js';
 import { confirmar } from '../dialogos.js';
 import { puede, motivoSinPermiso } from '../permisos.js';
@@ -190,18 +188,19 @@ const detalle = {
       acciones: acciones.join(''),
     });
 
-    const resumen = `<section class="panel" data-desde="1"><div class="panel__cuerpo"><div class="datos-fila">
+    const resumen = `<section class="panel" data-desde="5"><div class="panel__cuerpo"><div class="datos-fila">
       ${dato('Ajuste solicitado', `<span class="${monto < 0 ? 'negativo' : 'positivo'}">${q(monto, { signo: true })}</span>`, monto < 0 ? 'A descontar' : 'A favor del vendedor', { grande: true })}
       ${dato('Período de origen', esc(nombrePeriodo(a.periodoOrigen)), chip('positivo', 'Pagado: no se reabre', 'lock'))}
       ${dato('Se aplica en', esc(nombrePeriodo(a.periodoAplicacion)), esc(estadoPeriodo(a.periodoAplicacion)))}
       ${dato('Estado', chipAjuste(a.estado), necesitaGerente ? `Supera ${q(LIMITE_AJUSTE_SIN_GERENTE)}: lo autoriza el Gerente` : 'Dentro del límite del Analista')}
     </div></div></section>`;
 
-    const barra = `<div style="margin-bottom:var(--e-4)">${barraCumplimiento({ cumplimiento: rr.recalculado.cumplimiento, escalones: rr.config.R001.escalones, anterior: rr.original.cumplimiento })}</div>`;
+    const barraOriginal = `<div data-desde="1" data-hasta="2" data-solo-secuencia hidden style="margin-bottom:var(--e-4)">${barraCumplimiento({ cumplimiento: rr.original.cumplimiento, escalones: rr.config.R001.escalones })}</div>`;
+    const barra = `<div data-desde="3" style="margin-bottom:var(--e-4)">${barraCumplimiento({ cumplimiento: rr.recalculado.cumplimiento, escalones: rr.config.R001.escalones, anterior: rr.original.cumplimiento })}</div>`;
     const bloque1 = panel({
       titulo: `Antes y después de ${nombrePeriodo(a.periodoOrigen)}`,
       subtitulo: `Con la misma versión de reglas (${esc(periodoRegistro(a.periodoOrigen)?.corrida?.version ?? '')}), no con las actuales. Un período pagado no se reabre.`,
-      cuerpo: `<div data-desde="1">${barra}</div><div data-desde="4">${comparador(rr, a)}</div>`, id: 'bloque-antes',
+      cuerpo: `${barraOriginal}${barra}<div data-desde="4">${comparador(rr, a)}</div>`, id: 'bloque-antes',
     });
     const frase = a.tipo === 'devolucion' && rr.cambioDeEscalon
       ? `<p class="frase-destacada" data-desde="3"><strong>Al devolverse ${esc(a.referencia.venta)}, ${esc(v.nombre.split(' ')[0])} bajó de ${pct(rr.original.cumplimiento)} a ${pct(rr.recalculado.cumplimiento)}.</strong> Cruzó el 100 %: su tasa pasó de ${pct(rr.original.tasa)} a ${pct(rr.recalculado.tasa)}, y esa tasa se aplica a todo lo que vendió en ${esc(nombrePeriodo(a.periodoOrigen))}.</p>` : '';
@@ -227,7 +226,7 @@ const detalle = {
       <div class="secuencia-texto" id="sec-texto" aria-live="polite"></div></div>`;
 
     const html = `<div class="pagina">${encab}<div class="pila">
-      ${control}${resumen}${bloque1}${bloque2}${bloque3}${bloque4}</div></div>`;
+      ${control}${resumen}<div data-desde="1">${bloque1}</div><div data-desde="5">${bloque2}</div><div data-desde="6">${bloque3}</div><div data-desde="7">${bloque4}</div></div></div>`;
 
     const dev = rr.quitadas[0];
     const PASOS = a.tipo === 'devolucion' && dev && rr.cambioDeEscalon ? [
@@ -253,15 +252,27 @@ const detalle = {
         const texto = raiz.querySelector('#sec-texto');
         const puntos = raiz.querySelector('#sec-puntos');
         const bloques = [...raiz.querySelectorAll('[data-desde]')];
+        bloques.forEach((b) => { if (b.hasAttribute('data-solo-secuencia')) b.hidden = true; });
         const foco = { 1: '#bloque-antes', 2: '#bloque-antes', 3: '#bloque-antes', 4: '#bloque-antes', 5: '#bloque-separacion', 6: '#bloque-aplicacion', 7: '#bloque-aplicacion' };
         puntos.innerHTML = PASOS.map((_, i) => `<button type="button" aria-label="Paso ${i + 1}"></button>`).join('');
         const dibujar = () => {
+          const actual = paso + 1;
           bloques.forEach((b) => {
-            const visible = !activa || Number(b.dataset.desde) <= paso + 1;
+            const desde = Number(b.dataset.desde);
+            const hasta = b.dataset.hasta ? Number(b.dataset.hasta) : Infinity;
+            const soloSecuencia = b.hasAttribute('data-solo-secuencia');
+            const visible = activa ? desde <= actual && actual <= hasta : !soloSecuencia;
+            const estabaOculto = b.classList.contains('sec-oculto') || b.hidden;
+            b.hidden = false;
             b.classList.toggle('sec-oculto', !visible);
+            if (visible && estabaOculto && activa && !reducido) { b.classList.remove('sec-nuevo'); void b.offsetWidth; b.classList.add('sec-nuevo'); }
           });
           raiz.querySelectorAll('.sec-foco').forEach((e) => e.classList.remove('sec-foco'));
-          if (activa) raiz.querySelector(foco[paso + 1])?.classList.add('sec-foco');
+          if (activa) {
+            const destino = raiz.querySelector(foco[actual]);
+            destino?.classList.add('sec-foco');
+            destino?.scrollIntoView({ behavior: reducido ? 'auto' : 'smooth', block: 'start' });
+          }
           [...puntos.children].forEach((b, i) => { b.toggleAttribute('aria-current', i === paso); if (i === paso) b.setAttribute('aria-current', 'step'); b.classList.toggle('pasado', i < paso); });
           texto.innerHTML = `<strong>${paso + 1}. ${PASOS[paso][0]}</strong>${PASOS[paso][1]}`;
           control_.hidden = !activa;
@@ -355,4 +366,3 @@ const lista = {
 };
 
 export { detalle as ajuste, lista as ajustes };
-export { calculo, fmtFechaLarga, explicable };

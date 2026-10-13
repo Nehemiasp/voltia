@@ -1,13 +1,13 @@
 // P08 · Disputas. El vendedor reclama desde su detalle; el Analista analiza con la trazabilidad al lado.
 
 import { obtener } from '../estado.js';
-import { resultado, hayResultados, estadoPeriodo, periodosDisponibles, buscarVentas, configDe, corteDe } from '../selectores.js';
+import { resultado, hayResultados, estadoPeriodo, periodosDisponibles, buscarVentas, configDe } from '../selectores.js';
 import { simularReasignacion } from '../acciones.js';
 import { construirCascada } from '../../engine/calculo.js';
 import { ventasDe } from '../../engine/ventas.js';
 import { VENDEDOR, TIENDA } from '../../engine/datos.js';
-import { esc, fmtQ, fmtFecha, fmtFechaHora, nombrePeriodo } from '../../engine/formato.js';
-import { ico, chip, chipDisputa, chipAjuste, q, pct, nota, panel, encabezado, boton, motivoVisible, estadoVista, cascada, variacion } from '../ui.js';
+import { esc, fmtFecha, fmtFechaHora, nombrePeriodo } from '../../engine/formato.js';
+import { ico, chipDisputa, chipAjuste, q, pct, panel, encabezado, boton, motivoVisible, estadoVista, cascada, variacion } from '../ui.js';
 import { confirmar } from '../dialogos.js';
 import { puede, motivoSinPermiso } from '../permisos.js';
 import { migas } from './comun.js';
@@ -243,4 +243,3 @@ const detalle = {
 };
 
 export { detalle as disputa, lista as disputas };
-export { fmtQ, chip, corteDe };

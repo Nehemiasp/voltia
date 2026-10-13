@@ -2,8 +2,8 @@
 
 import { estadoPeriodo, periodoRegistro, resumenPeriodo, periodosConResultados } from '../selectores.js';
 import { filasDePago, generarCsv, validarExportacion } from '../acciones.js';
-import { esc, fmtFecha, nombrePeriodo, fmtQ } from '../../engine/formato.js';
-import { ico, chip, chipPeriodo, q, nota, panel, encabezado, dato, boton, motivoVisible, estadoVista } from '../ui.js';
+import { esc, fmtFecha, nombrePeriodo } from '../../engine/formato.js';
+import { ico, chip, chipPeriodo, q, panel, encabezado, dato, boton, motivoVisible, estadoVista } from '../ui.js';
 import { confirmar } from '../dialogos.js';
 import { puede, motivoSinPermiso } from '../permisos.js';
 import { selectorPeriodo, enlazarSelectores, migas } from './comun.js';
@@ -51,7 +51,6 @@ export default {
     const csv = generarCsv(periodo);
     const validacion = validarExportacion(periodo, csv);
     const filas = filasDePago(periodo);
-    const puedeExportar = puede(ctx.rol, 'pago.exportar') && estado === 'Aprobado';
     const exportado = Boolean(reg.exportado);
     const puedePagar = puede(ctx.rol, 'pago.marcarPagado') && estado === 'Aprobado' && exportado;
     const retenido = filas.reduce((s, f) => s + f.retenido, 0);
@@ -111,5 +110,3 @@ export default {
     };
   },
 };
-
-export { fmtQ, nota };

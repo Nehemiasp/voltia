@@ -1,13 +1,12 @@
 // P06 · Aprobación del período (Gerente Comercial). Aprobar es irreversible: la confirmación resume el impacto.
 
 import {
-  calculo, resumenPeriodo, estadoPeriodo, periodoRegistro, bloqueosAprobacion, pendientesGerente, periodosConResultados, saldosHaciaSiguiente,
-  aPagar, observaciones, ajustesAplicablesA, LIMITE_AJUSTE_SIN_GERENTE,
+  calculo, resumenPeriodo, estadoPeriodo, periodoRegistro, bloqueosAprobacion, pendientesGerente, periodosConResultados, saldosHaciaSiguiente, aPagar, ajustesAplicablesA,
 } from '../selectores.js';
 import { VENDEDOR } from '../../engine/datos.js';
-import { esc, fmtQ, fmtPct, nombrePeriodo, fmtFecha, mesCorto } from '../../engine/formato.js';
+import { esc, fmtQ, fmtPct, nombrePeriodo, fmtFecha } from '../../engine/formato.js';
 import {
-  ico, chip, chipPeriodo, q, pct, nota, panel, encabezado, dato, boton, motivoVisible, variacion, estadoVista,
+  ico, chipPeriodo, q, pct, nota, panel, encabezado, dato, boton, motivoVisible, variacion, estadoVista,
 } from '../ui.js';
 import { confirmar } from '../dialogos.js';
 import { puede, motivoSinPermiso } from '../permisos.js';
@@ -175,5 +174,3 @@ export default {
     };
   },
 };
-
-export { chip, fmtQ, mesCorto, observaciones, LIMITE_AJUSTE_SIN_GERENTE, VENDEDOR };

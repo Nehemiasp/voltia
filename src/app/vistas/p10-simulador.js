@@ -1,10 +1,10 @@
 // P10 · Simulador de cambio de regla. Antes de activar una versión, cuánto cuesta y a quién le cambia.
 
-import { periodosConResultados, corteDe, configDe, periodoFoco, metasDeCorrida } from '../selectores.js';
+import { periodosConResultados, corteDe, configDe, metasDeCorrida } from '../selectores.js';
 import { calcularPeriodo } from '../../engine/calculo.js';
 import { CATEGORIAS } from '../../engine/reglas.js';
-import { esc, fmtQ, fmtPct, nombrePeriodo } from '../../engine/formato.js';
-import { ico, chip, q, pct, nota, panel, encabezado, dato, boton, variacion, estadoVista } from '../ui.js';
+import { esc, fmtPct } from '../../engine/formato.js';
+import { ico, q, pct, nota, panel, encabezado, dato, boton, variacion, estadoVista } from '../ui.js';
 import { puede } from '../permisos.js';
 import { periodoDe, selectorPeriodo, enlazarSelectores, migas } from './comun.js';
 
@@ -75,7 +75,6 @@ function resultados(periodo, p) {
 
 function bloqueResultados(res, p, periodo) {
   const cambiado = res.costo !== 0 || res.cambian.length > 0;
-  const nombresEsc = (i, config) => `${config.R001.escalones[i].tasa} %`;
   const max = Math.max(...res.porTienda.map((t) => Math.abs(t.delta)), 1);
   const tiendas = res.porTienda.map((t) => `<tr><th scope="row">${esc(t.nombre)}</th><td class="num">${q(t.antes)}</td><td class="num">${q(t.despues)}</td>
     <td style="min-width:120px"><div class="barra-fila__pista" aria-hidden="true"><div class="barra-fila__relleno" style="width:${(Math.abs(t.delta) / max) * 100}%"></div></div></td><td class="num">${variacion(t.delta, { inverso: true })}</td></tr>`).join('');
@@ -113,7 +112,6 @@ export default {
     if (!parametros || parametros.periodo !== periodo) parametros = { ...aplicarPreset(base, 'caso'), periodo };
     const p = parametros;
     const analista = puede(ctx.rol, 'simulador.usar');
-    const valido = hayCambioValido(p);
     const esc1 = configDe(periodo).R001.escalones;
 
     const filasEsc = p.desde.map((d, i) => `<tr><th scope="row">${i + 1}</th>
@@ -184,5 +182,3 @@ export default {
     };
   },
 };
-
-export { chip, fmtQ, nombrePeriodo, periodoFoco };

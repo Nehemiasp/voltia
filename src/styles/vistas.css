@@ -70,7 +70,7 @@
 .bloque-simple { padding: var(--e-3); background: var(--fondo); border-radius: var(--radio-control); font-size: var(--t-m); }
 .bloque-simple p { margin: 4px 0 0; }
 .marco--movil { grid-template-columns: minmax(0, 1fr); }
-.marco--movil .lateral { position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 40; height: auto; display: flex; padding: 0; border-right: 0; border-top: 1px solid var(--linea); overflow: visible; }
+.marco--movil .lateral { position: fixed; left: 50%; transform: translateX(-50%); width: min(520px, 100%); bottom: 0; top: auto; z-index: 40; height: auto; display: flex; padding: 0; border-right: 0; border-top: 1px solid var(--linea); overflow: visible; }
 .marco--movil .lateral__grupo { margin: 0; flex: 1; }
 .marco--movil .lateral__titulo { display: none; }
 .marco--movil .lateral ul { display: flex; }
@@ -102,3 +102,6 @@
 .muestra__cab { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--e-2); padding: var(--e-3) var(--e-4); border-bottom: 1px solid var(--linea); background: var(--fondo); }
 .muestra__cuerpo { padding: var(--e-4); }
 .muestra__cuerpo .estado-vista { padding: var(--e-5) var(--e-3); }
+
+/* Control de la secuencia de P09: queda visible mientras se desplaza la pantalla */
+.secuencia-control { position: sticky; top: calc(var(--alto-cabecera) + 8px); z-index: 20; box-shadow: var(--sombra-flotante); }

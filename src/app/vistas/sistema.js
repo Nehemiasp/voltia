@@ -3,8 +3,7 @@
 
 import { CONJUNTOS } from '../../engine/reglas.js';
 import {
-  ico, chip, chipPeriodo, chipResultado, chipRegla, chipDisputa, chipAjuste, q, nota, panel, encabezado, boton, barraCumplimiento, cascada, lineaEstados,
-  eventos, fraseDeRegla, estadoVista, esqueleto, thOrden, explicable, dato, motivoVisible, resumenImpacto,
+  ico, chip, chipPeriodo, chipResultado, chipRegla, chipDisputa, chipAjuste, nota, panel, encabezado, boton, barraCumplimiento, cascada, lineaEstados, eventos, fraseDeRegla, estadoVista, esqueleto, thOrden, explicable, motivoVisible, resumenImpacto,
 } from '../ui.js';
 import { confirmar, abrirPanel } from '../dialogos.js';
 import { esc } from '../../engine/formato.js';
@@ -129,5 +128,3 @@ export default {
     };
   },
 };
-
-export { ico, q, CONJUNTOS };

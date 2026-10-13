@@ -22,11 +22,17 @@ export async function irA(pagina, { momento = 'M1', rol = 'analista', vendedor =
   await pagina.goto(`${BASE}/`, { waitUntil: 'networkidle' });
   await pagina.evaluate(() => localStorage.clear());
   await pagina.goto(`${BASE}/`, { waitUntil: 'networkidle' });
+  await abrirControles(pagina);
   await pagina.selectOption('#demo-momento', momento);
   await pagina.selectOption('#demo-rol', rol);
   if (vendedor) await pagina.selectOption('#demo-vendedor', vendedor);
   await pagina.evaluate((r) => { location.hash = r; }, ruta);
   await pagina.waitForTimeout(250);
+}
+
+/** En pantallas angostas los controles de la demostración están plegados. */
+export async function abrirControles(pagina) {
+  await pagina.evaluate(() => document.querySelector('.demo-det')?.setAttribute('open', ''));
 }
 
 export async function esperarFuentes(pagina) {

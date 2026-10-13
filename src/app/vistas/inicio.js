@@ -3,7 +3,7 @@
 import { MOMENTOS } from '../semillas.js';
 import { ORDEN_APLICACION } from '../../engine/reglas.js';
 import { ROLES } from '../permisos.js';
-import { ico, panel, encabezado, chipRegla2, boton } from '../ui.js';
+import { ico, panel, encabezado, chipRegla2 } from '../ui.js';
 import { esc } from '../../engine/formato.js';
 import { ID } from '../../engine/datos.js';
 
@@ -94,5 +94,3 @@ export default {
     };
   },
 };
-
-export { boton };

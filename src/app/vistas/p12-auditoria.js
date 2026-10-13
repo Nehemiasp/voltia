@@ -1,9 +1,8 @@
 // P12 · Historial de auditoría. Quién, qué, cuándo, valor anterior y nuevo; desde cada evento se llega a la entidad.
 
-import { obtener } from '../estado.js';
 import { VENDEDOR } from '../../engine/datos.js';
-import { esc, fmtFecha, fmtFechaLarga } from '../../engine/formato.js';
-import { ico, panel, encabezado, boton, estadoVista, eventos, chip } from '../ui.js';
+import { esc, fmtFechaLarga } from '../../engine/formato.js';
+import { panel, encabezado, boton, estadoVista, eventos } from '../ui.js';
 import { ROLES } from '../permisos.js';
 
 const POR_PAGINA = 40;
@@ -97,5 +96,3 @@ export default {
     };
   },
 };
-
-export { ico, chip, fmtFecha, obtener };
